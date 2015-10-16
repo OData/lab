@@ -92,7 +92,7 @@ namespace ODataServiceToSwagger
             return jObject;
         }
 
-        public static JArray Parameter(this JArray parameters, string name, string kind, string description, string type, string format = null, bool? required = true)
+        public static JArray Parameter(this JArray parameters, string name, string kind, string description, string type, string format = null, bool? required = null)
         {
             parameters.Add(new JObject()
             {
@@ -388,7 +388,8 @@ namespace ODataServiceToSwagger
             {
                 string format;
                 string type = GetPrimitiveTypeAndFormat(key.Type.Definition as IEdmPrimitiveType, out format);
-                swaggerParameters.Parameter(key.Name, "path", "key: " + key.Name, type, format);
+                bool required = key.Type.IsNullable;
+                swaggerParameters.Parameter(key.Name, "path", "key: " + key.Name, type, format, required);
             }
 
             foreach (var parameter in operation.Parameters.Skip(1))
