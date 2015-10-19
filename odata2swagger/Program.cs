@@ -7,6 +7,7 @@ using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Validation;
 using Newtonsoft.Json.Linq;
 
+
 namespace ODataServiceToSwagger
 {
     public static class ExtensionMethods
