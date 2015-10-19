@@ -388,7 +388,7 @@ namespace ODataServiceToSwagger
             {
                 string format;
                 string type = GetPrimitiveTypeAndFormat(key.Type.Definition as IEdmPrimitiveType, out format);
-                bool required = key.Type.IsNullable;
+                bool required = !key.Type.IsNullable ;
                 swaggerParameters.Parameter(key.Name, "path", "key: " + key.Name, type, format, required);
             }
 
