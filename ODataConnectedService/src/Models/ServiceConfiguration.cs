@@ -14,6 +14,8 @@ namespace Microsoft.OData.ConnectedService.Models
         public bool UseNameSpacePrefix { get; set; }
         public string NamespacePrefix { get; set; }
         public bool UseDataServiceCollection { get; set; }
+        public bool UseRuntimeModel { get; set; }
+        public bool LazyInitializedEntityCollections { get; set; }
     }
 
     internal class ServiceConfigurationV4 : ServiceConfiguration
