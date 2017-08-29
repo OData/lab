@@ -42,7 +42,7 @@ public static class Customization
 
 		if (text.Length == 1)
 		{
-			return Char.ToUpperInvariant(text[0]).ToString(CultureInfo.CurrentCulture);
+			return Char.ToUpperInvariant(text[0]).ToString(CultureInfo.InvariantCulture);
 		}
 
 		return Char.ToUpperInvariant(text[0]) + text.Substring(1);

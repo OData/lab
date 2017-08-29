@@ -58,7 +58,7 @@ namespace Microsoft.OData.ConnectedService
             }
             else
             {
-                throw new Exception(string.Format(CultureInfo.CurrentCulture, "Not supported Edmx Version {0}", edmxVersion.ToString()));
+                throw new Exception(string.Format(CultureInfo.InvariantCulture, "Not supported Edmx Version {0}", edmxVersion.ToString()));
             }
 
             await codeGenDescriptor.AddNugetPackages();

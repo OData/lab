@@ -115,7 +115,7 @@ namespace Microsoft.OData.ConnectedService.ViewModels
             }
             catch (WebException e)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Cannot access {0}", this.Endpoint), e);
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Cannot access {0}", this.Endpoint), e);
             }
         }
     }
