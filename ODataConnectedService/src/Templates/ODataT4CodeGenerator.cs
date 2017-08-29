@@ -97,7 +97,7 @@ THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             break;
 
         default:
-            throw new NotSupportedException(string.Format("Code gen for the target language '{0}' is not supported.", this.TargetLanguage.ToString()));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, "Code gen for the target language '{0}' is not supported.", this.TargetLanguage.ToString()));
     }
 
 
@@ -168,7 +168,7 @@ public static class Customization
 
 		if (text.Length == 1)
 		{
-			return Char.ToUpperInvariant(text[0]).ToString(CultureInfo.InvariantCulture);
+			return Char.ToUpperInvariant(text[0]).ToString(CultureInfo.CurrentCulture);
 		}
 
 		return Char.ToUpperInvariant(text[0]) + text.Substring(1);
@@ -230,7 +230,7 @@ public string MetadataDocumentUri
             // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
             // value then hit Ctrl-S to save the .tt file to refresh the code generation.
             // ********************************************************************************************************
-            throw new ArgumentException(string.Format("The value \"{0}\" is not a valid MetadataDocumentUri because is it not a valid absolute Uri. The MetadataDocumentUri must be set to an absolute Uri referencing the $metadata endpoint of an OData service.", value));
+            throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The value \"{0}\" is not a valid MetadataDocumentUri because is it not a valid absolute Uri. The MetadataDocumentUri must be set to an absolute Uri referencing the $metadata endpoint of an OData service.", value));
         }
 
         if (uri.Scheme == "http" || uri.Scheme == "https")
@@ -347,7 +347,7 @@ public void ValidateAndSetUseDataServiceCollectionFromString(string stringValue)
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format("The value \"{0}\" cannot be assigned to the UseDataServiceCollection parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The value \"{0}\" cannot be assigned to the UseDataServiceCollection parameter because it is not a valid boolean value.", stringValue));
     }
 
     this.UseDataServiceCollection = boolValue;
@@ -367,7 +367,7 @@ public void ValidateAndSetTargetLanguageFromString(string stringValue)
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format("The value \"{0}\" cannot be assigned to the TargetLanguage parameter because it is not a valid LanguageOption. The supported LanguageOptions are \"CSharp\" and \"VB\".", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The value \"{0}\" cannot be assigned to the TargetLanguage parameter because it is not a valid LanguageOption. The supported LanguageOptions are \"CSharp\" and \"VB\".", stringValue));
     }
 
     this.TargetLanguage = option;
@@ -387,7 +387,7 @@ public void ValidateAndSetEnableNamingAliasFromString(string stringValue)
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format("The value \"{0}\" cannot be assigned to the EnableNamingAlias parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The value \"{0}\" cannot be assigned to the EnableNamingAlias parameter because it is not a valid boolean value.", stringValue));
     }
 
     this.EnableNamingAlias = boolValue;
@@ -407,7 +407,7 @@ public void ValidateAndSetIgnoreUnexpectedElementsAndAttributesFromString(string
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format("The value \"{0}\" cannot be assigned to the IgnoreUnexpectedElementsAndAttributes parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The value \"{0}\" cannot be assigned to the IgnoreUnexpectedElementsAndAttributes parameter because it is not a valid boolean value.", stringValue));
     }
 
     this.IgnoreUnexpectedElementsAndAttributes = boolValue;
@@ -618,7 +618,7 @@ public class CodeGenerationContext
     /// <summary>
     /// Basic setting for XmlReader.
     /// </summary>
-    private static readonly XmlReaderSettings settings = new XmlReaderSettings() { IgnoreWhitespace = true };
+    private static readonly XmlReaderSettings settings = new XmlReaderSettings() { IgnoreWhitespace = true, XmlResolver = null };
 
     /// <summary>
     /// The func for user code to overwrite and provide referenced model's XmlReader.
@@ -908,7 +908,7 @@ public class CodeGenerationContext
             {
                 if (template.LanguageKeywords.Contains(segments[i]))
                 {
-                    prefixedNamespace += string.Format(template.FixPattern, segments[i]);
+                    prefixedNamespace += string.Format(CultureInfo.CurrentCulture, template.FixPattern, segments[i]);
                 }
                 else
                 {
@@ -1292,8 +1292,8 @@ public abstract class ODataClientTemplate : TemplateBase
                         string typeName = Utils.GetClrTypeName(key.Type, this.context.UseDataServiceCollection, this, this.context);
                         string keyName = Utils.CamelCase(key.Name);
                         keyNames.Add(keyName);
-                        keyParameters.Add(string.Format(this.ParameterDeclarationTemplate, typeName, this.GetFixedName(keyName)));
-                        keyDictionaryItems.Add(string.Format(this.DictionaryItemConstructor, "\"" + key.Name + "\"", this.GetFixedName(keyName)));
+                        keyParameters.Add(string.Format(CultureInfo.CurrentCulture, this.ParameterDeclarationTemplate, typeName, this.GetFixedName(keyName)));
+                        keyDictionaryItems.Add(string.Format(CultureInfo.CurrentCulture, this.DictionaryItemConstructor, "\"" + key.Name + "\"", this.GetFixedName(keyName)));
                     }
 
                     string keyParametersString = string.Join(this.KeyParameterSeparator, keyParameters);
@@ -1323,10 +1323,10 @@ public abstract class ODataClientTemplate : TemplateBase
                     bool useEntityReference;
                     this.GetParameterStrings(function.IsBound, false, function.Parameters.ToArray(), out parameterString, out parameterTypes, out parameterExpressionString, out parameterValues, out useEntityReference);
                     string sourceTypeName = GetSourceOrReturnTypeName(edmTypeReference);
-                    sourceTypeName = string.Format(edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, sourceTypeName);
+                    sourceTypeName = string.Format(CultureInfo.CurrentCulture, edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, sourceTypeName);
                     string returnTypeName = GetSourceOrReturnTypeName(function.ReturnType);
                     string fixedFunctionName = GetFixedName(functionName);
-                    string func = string.Format("{0}({1},{2})", fixedFunctionName, sourceTypeName, parameterTypes );
+                    string func = string.Format(CultureInfo.CurrentCulture, "{0}({1},{2})", fixedFunctionName, sourceTypeName, parameterTypes );
 
                     if (!boundOperations.Contains(func))
                     {
@@ -1362,8 +1362,8 @@ public abstract class ODataClientTemplate : TemplateBase
                             List<IEdmTypeReference> currentParameters = function.Parameters.Select(p => p.Type).ToList();
                             currentParameters[0] = derivedTypeReference;
 
-                            sourceTypeName = string.Format(edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, GetSourceOrReturnTypeName(derivedTypeReference));
-                            string currentFunc = string.Format("{0}({1},{2})", fixedFunctionName, sourceTypeName, parameterTypes );
+                            sourceTypeName = string.Format(CultureInfo.CurrentCulture, edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, GetSourceOrReturnTypeName(derivedTypeReference));
+                            string currentFunc = string.Format(CultureInfo.CurrentCulture, "{0}({1},{2})", fixedFunctionName, sourceTypeName, parameterTypes );
                             if (!boundOperations.Contains(currentFunc))
                             {
                                 boundOperations.Add(currentFunc);
@@ -1392,18 +1392,18 @@ public abstract class ODataClientTemplate : TemplateBase
                     bool useEntityReference;
                     this.GetParameterStrings(action.IsBound, true, action.Parameters.ToArray(), out parameterString, out parameterTypes, out parameterExpressionString, out parameterValues, out useEntityReference);
                     string sourceTypeName = GetSourceOrReturnTypeName(edmTypeReference);
-                    sourceTypeName = string.Format(edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, sourceTypeName);
+                    sourceTypeName = string.Format(CultureInfo.CurrentCulture, edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, sourceTypeName);
                     string returnTypeName;
                     if (action.ReturnType != null)
                     {
                         returnTypeName = GetSourceOrReturnTypeName(action.ReturnType);
                         if (action.ReturnType.IsCollection())
                         {
-                            returnTypeName = string.Format(this.DataServiceActionQueryOfTStructureTemplate, returnTypeName);
+                            returnTypeName = string.Format(CultureInfo.CurrentCulture, this.DataServiceActionQueryOfTStructureTemplate, returnTypeName);
                         }
                         else
                         {
-                            returnTypeName = string.Format(this.DataServiceActionQuerySingleOfTStructureTemplate, returnTypeName);
+                            returnTypeName = string.Format(CultureInfo.CurrentCulture, this.DataServiceActionQuerySingleOfTStructureTemplate, returnTypeName);
                         }
                     }
                     else
@@ -1412,7 +1412,7 @@ public abstract class ODataClientTemplate : TemplateBase
                     }
 
                     string fixedActionName = GetFixedName(actionName);
-                    string ac = string.Format("{0}({1},{2})", fixedActionName, sourceTypeName, parameterTypes );
+                    string ac = string.Format(CultureInfo.CurrentCulture, "{0}({1},{2})", fixedActionName, sourceTypeName, parameterTypes );
                     if (!boundOperations.Contains(ac))
                     {
                         boundOperations.Add(ac);
@@ -1439,8 +1439,8 @@ public abstract class ODataClientTemplate : TemplateBase
                             List<IEdmTypeReference> currentParameters = action.Parameters.Select(p => p.Type).ToList();
                             currentParameters[0] = derivedTypeReference;
 
-                            sourceTypeName = string.Format(edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, GetSourceOrReturnTypeName(derivedTypeReference));
-                            string currentAc = string.Format("{0}({1},{2})", fixedActionName, sourceTypeName, parameterTypes );
+                            sourceTypeName = string.Format(CultureInfo.CurrentCulture, edmTypeReference.IsCollection() ? this.DataServiceQueryStructureTemplate : this.DataServiceQuerySingleStructureTemplate, GetSourceOrReturnTypeName(derivedTypeReference));
+                            string currentAc = string.Format(CultureInfo.CurrentCulture, "{0}({1},{2})", fixedActionName, sourceTypeName, parameterTypes );
                             if (!boundOperations.Contains(currentAc))
                             {
                                 boundOperations.Add(currentAc);
@@ -1589,11 +1589,11 @@ public abstract class ODataClientTemplate : TemplateBase
                 returnTypeName = GetSourceOrReturnTypeName(actionImport.Action.ReturnType);
                 if (actionImport.Action.ReturnType.IsCollection())
                 {
-                    returnTypeName = string.Format(this.DataServiceActionQueryOfTStructureTemplate, returnTypeName);
+                    returnTypeName = string.Format(CultureInfo.CurrentCulture, this.DataServiceActionQueryOfTStructureTemplate, returnTypeName);
             }
                 else
                 {
-                    returnTypeName = string.Format(this.DataServiceActionQuerySingleOfTStructureTemplate, returnTypeName);
+                    returnTypeName = string.Format(CultureInfo.CurrentCulture, this.DataServiceActionQuerySingleOfTStructureTemplate, returnTypeName);
                 }
             }
             else
@@ -1712,11 +1712,11 @@ public abstract class ODataClientTemplate : TemplateBase
         entityTypeName = this.context.EnableNamingAlias ? Customization.CustomizeNaming(entityTypeName) : entityTypeName;
         this.WriteSummaryCommentForStructuredType(entityTypeName + this.singleSuffix);
         this.WriteStructurdTypeDeclaration(entityType,
-            this.ClassInheritMarker + string.Format(this.DataServiceQuerySingleStructureTemplate, GetFixedName(entityTypeName)),
+            this.ClassInheritMarker + string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, GetFixedName(entityTypeName)),
             this.singleSuffix);
         string singleTypeName = (this.context.EnableNamingAlias ?
             Customization.CustomizeNaming(((IEdmSchemaElement)entityType).Name) : ((IEdmSchemaElement)entityType).Name) + this.singleSuffix;
-        this.WriteConstructorForSingleType(GetFixedName(singleTypeName), string.Format(this.DataServiceQuerySingleStructureTemplate, GetFixedName(entityTypeName)));
+        this.WriteConstructorForSingleType(GetFixedName(singleTypeName), string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, GetFixedName(entityTypeName)));
         IEdmEntityType current = entityType;
         while (current != null)
         {
@@ -1828,11 +1828,11 @@ public abstract class ODataClientTemplate : TemplateBase
                     returnTypeName = GetSourceOrReturnTypeName(action.ReturnType);
                     if (action.ReturnType.IsCollection())
                     {
-                        returnTypeName = string.Format(this.DataServiceActionQueryOfTStructureTemplate, returnTypeName);
+                        returnTypeName = string.Format(CultureInfo.CurrentCulture, this.DataServiceActionQueryOfTStructureTemplate, returnTypeName);
                     }
                     else
                     {
-                        returnTypeName = string.Format(this.DataServiceActionQuerySingleOfTStructureTemplate, returnTypeName);
+                        returnTypeName = string.Format(CultureInfo.CurrentCulture, this.DataServiceActionQuerySingleOfTStructureTemplate, returnTypeName);
                     }
                 }
                 else
@@ -2002,7 +2002,7 @@ public abstract class ODataClientTemplate : TemplateBase
             }
             
             parameterString += i == n - 1 ? string.Empty : ", ";
-            parameterTypes += string.Format(this.TypeofFormatter, typeName) + ", ";
+            parameterTypes += string.Format(CultureInfo.CurrentCulture, this.TypeofFormatter, typeName) + ", ";
             parameterExpressionString += this.GetParameterExpressionString(param, typeName) + ", ";
             
             if (i != (isBound ? 1 : 0))
@@ -2012,16 +2012,16 @@ public abstract class ODataClientTemplate : TemplateBase
             
             if (isAction)
             {
-                parameterValues += string.Format(this.BodyOperationParameterConstructor, param.Name, GetFixedName(param.Name));
+                parameterValues += string.Format(CultureInfo.CurrentCulture, this.BodyOperationParameterConstructor, param.Name, GetFixedName(param.Name));
             }
             else  if (param.Type.IsEntity() || (param.Type.IsCollection() && param.Type.AsCollection().ElementType().IsEntity()))
             {
                 useEntityReference = true;
-                parameterValues += string.Format(this.UriEntityOperationParameterConstructor, param.Name, GetFixedName(param.Name),"useEntityReference");
+                parameterValues += string.Format(CultureInfo.CurrentCulture, this.UriEntityOperationParameterConstructor, param.Name, GetFixedName(param.Name),"useEntityReference");
             }
             else
             {
-                parameterValues += string.Format(this.UriOperationParameterConstructor, param.Name, GetFixedName(param.Name));
+                parameterValues += string.Format(CultureInfo.CurrentCulture, this.UriOperationParameterConstructor, param.Name, GetFixedName(param.Name));
             }
         }
     }
@@ -2039,10 +2039,10 @@ public abstract class ODataClientTemplate : TemplateBase
                 clrTypeName += "?";
             }
 
-            return string.Format(this.ConstantExpressionConstructorWithType, GetFixedName(param.Name), clrTypeName);
+            return string.Format(CultureInfo.CurrentCulture, this.ConstantExpressionConstructorWithType, GetFixedName(param.Name), clrTypeName);
         }
 
-        return string.Format(this.ConstantExpressionConstructorWithType, GetFixedName(param.Name), typeName); 
+        return string.Format(CultureInfo.CurrentCulture, this.ConstantExpressionConstructorWithType, GetFixedName(param.Name), typeName); 
     }
 
     // This is to solve duplicate names between property and type
@@ -2267,7 +2267,7 @@ public abstract class ODataClientTemplate : TemplateBase
                 IEdmIntegerValue integerValue = member.Value as IEdmIntegerValue;
                 if (integerValue != null)
                 {
-                    value = " = " + integerValue.Value.ToString(CultureInfo.InvariantCulture);
+                    value = " = " + integerValue.Value.ToString(CultureInfo.CurrentCulture);
                 }
             }
 
@@ -2282,7 +2282,7 @@ public abstract class ODataClientTemplate : TemplateBase
 
         if (this.LanguageKeywords.Contains(fixedName))
         {
-            fixedName = string.Format(this.FixPattern, fixedName);
+            fixedName = string.Format(CultureInfo.CurrentCulture, this.FixPattern, fixedName);
         }
 
         return fixedName;
@@ -2528,7 +2528,7 @@ public abstract class TemplateBase
     /// </summary>
     public class ToStringInstanceHelper
     {
-        private System.IFormatProvider formatProviderField  = global::System.Globalization.CultureInfo.InvariantCulture;
+        private System.IFormatProvider formatProviderField  = global::System.Globalization.CultureInfo.CurrentCulture;
         /// <summary>
         /// Gets or sets format provider to be used by ToStringWithCulture method.
         /// </summary>
@@ -2632,7 +2632,7 @@ internal sealed class UniqueIdentifierService
         while (this.knownIdentifiers.Contains(uniqueIdentifier))
         {
             ++numberOfConflicts;
-            uniqueIdentifier = identifier + numberOfConflicts.ToString(CultureInfo.InvariantCulture);
+            uniqueIdentifier = identifier + numberOfConflicts.ToString(CultureInfo.CurrentCulture);
         }
 
         // remember the identifier in this scope
@@ -2706,10 +2706,10 @@ internal static class Utils
 
         if (text.Length == 1)
         {
-            return text[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
+            return text[0].ToString(CultureInfo.CurrentCulture).ToLowerInvariant();
         }
 
-        return text[0].ToString(CultureInfo.InvariantCulture).ToLowerInvariant() + text.Substring(1);
+        return text[0].ToString(CultureInfo.CurrentCulture).ToLowerInvariant() + text.Substring(1);
     }
 
     /// <summary>
@@ -2726,10 +2726,10 @@ internal static class Utils
 
         if (text.Length == 1)
         {
-            return text[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
+            return text[0].ToString(CultureInfo.CurrentCulture).ToUpperInvariant();
         }
 
-        return text[0].ToString(CultureInfo.InvariantCulture).ToUpperInvariant() + text.Substring(1);
+        return text[0].ToString(CultureInfo.CurrentCulture).ToUpperInvariant() + text.Substring(1);
     }
 
     /// <summary>
@@ -2754,7 +2754,7 @@ internal static class Utils
             clrTypeName = Utils.GetClrTypeName(edmPrimitiveType, clientTemplate);
             if (edmTypeReference.IsNullable && !clientTemplate.ClrReferenceTypes.Contains(edmPrimitiveType.PrimitiveKind) && addNullableTemplate)
             {
-                clrTypeName = string.Format(clientTemplate.SystemNullableStructureTemplate, clrTypeName);
+                clrTypeName = string.Format(CultureInfo.CurrentCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
             }
         }
         else
@@ -2774,7 +2774,7 @@ internal static class Utils
                         context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmEnumType.Name)) : clientTemplate.GetFixedName(edmEnumType.Name), clientTemplate, needGlobalPrefix);
                     if (edmTypeReference.IsNullable && addNullableTemplate)
                     {
-                        clrTypeName = string.Format(clientTemplate.SystemNullableStructureTemplate, clrTypeName);
+                        clrTypeName = string.Format(CultureInfo.CurrentCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
                     }
                 }
                 else 
@@ -2809,7 +2809,7 @@ internal static class Utils
                                                                 : clientTemplate.ObservableCollectionStructureTemplate)
                                                             : clientTemplate.ObjectModelCollectionStructureTemplate);
 
-                        clrTypeName = string.Format(collectionTypeName, clrTypeName);
+                        clrTypeName = string.Format(CultureInfo.CurrentCulture, collectionTypeName, clrTypeName);
                     }
                 }
             }
@@ -2907,7 +2907,7 @@ internal static class Utils
                         else
                         {
                             // decimal in VB must be initialized with 'D' at the end, like Decimal dec = 3.00D
-                            defaultValue = defaultValue.ToLower().Replace("m", "D");
+                            defaultValue = defaultValue.ToLower(CultureInfo.CurrentCulture).Replace("m", "D");
                             defaultValue = defaultValue.EndsWith("D", StringComparison.OrdinalIgnoreCase) ? defaultValue : defaultValue + "D";
                         }
                     }
@@ -2924,7 +2924,7 @@ internal static class Utils
                     }
                     else if (valueClrType.Contains("Microsoft.Spatial"))
                     {
-                        defaultValue = string.Format(clientTemplate.GeoTypeInitializePattern, valueClrType, defaultValue);
+                        defaultValue = string.Format(CultureInfo.CurrentCulture, clientTemplate.GeoTypeInitializePattern, valueClrType, defaultValue);
                     }
 
                     return defaultValue;
@@ -4364,7 +4364,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(originalFunctionName));
 
 this.Write("\", ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower()));
+this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower(CultureInfo.CurrentCulture)));
 
 this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues));
 
@@ -4397,7 +4397,7 @@ this.Write("\")]\r\n");
 
 this.Write("        public ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
+this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
 
 this.Write(" ");
 
@@ -4423,7 +4423,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(originalFunctionName));
 
 this.Write("\", ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower()));
+this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower(CultureInfo.CurrentCulture)));
 
 this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues));
 
@@ -4494,7 +4494,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(originalFunctionName));
 
 this.Write("\", ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower()));
+this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower(CultureInfo.CurrentCulture)));
 
 this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues));
 
@@ -4533,7 +4533,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(hideBaseMethod ? this.Overloa
 
 this.Write(" ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
+this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
 
 this.Write(" ");
 
@@ -4566,7 +4566,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(originalFunctionName));
 
 this.Write("\", ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower()));
+this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower(CultureInfo.CurrentCulture)));
 
 this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues));
 
@@ -4862,7 +4862,7 @@ this.Write("\")]\r\n");
 
 this.Write("        public static ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
+this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
 
 this.Write(" ");
 
@@ -4898,7 +4898,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(originalFunctionName));
 
 this.Write("\", ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower()));
+this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower(CultureInfo.CurrentCulture)));
 
 this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues));
 
@@ -4967,7 +4967,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(originalFunctionName));
 
 this.Write("\", ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower()));
+this.Write(this.ToStringHelper.ToStringWithCulture(isComposable.ToString().ToLower(CultureInfo.CurrentCulture)));
 
 this.Write(this.ToStringHelper.ToStringWithCulture(string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues));
 
@@ -6405,7 +6405,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(useEntityReference ? ", Optio
 
 this.Write(") As ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
+this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
 
 this.Write("\r\n            Return ");
 
@@ -6539,7 +6539,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(useEntityReference ? ", Optio
 
 this.Write(") As ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
+this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
 
 this.Write("\r\n            Dim requestUri As Global.System.Uri = Nothing\r\n            Context." +
         "TryGetUri(Me, requestUri)\r\n            Return ");
@@ -6808,8 +6808,8 @@ this.Write(" to its derived type ");
 this.Write(this.ToStringHelper.ToStringWithCulture(derivedTypeFullName));
 
 this.Write("\r\n        \'\'\' </summary>\r\n        \'\'\' <param name=\"source\">source entity</param>\r" +
-        "\n        <Global.System.Runtime.CompilerServices.Extension()>\r\n        Public " +
-        "Function CastTo");
+        "\n        <Global.System.Runtime.CompilerServices.Extension()>\r\n        Public Fu" +
+        "nction CastTo");
 
 this.Write(this.ToStringHelper.ToStringWithCulture(derivedTypeName));
 
@@ -6876,7 +6876,7 @@ this.Write(this.ToStringHelper.ToStringWithCulture(useEntityReference ? ", Optio
 
 this.Write(") As ");
 
-this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
+this.Write(this.ToStringHelper.ToStringWithCulture(isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.CurrentCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName)));
 
 this.Write("\r\n            If Not source.IsComposable Then\r\n                Throw New Global.S" +
         "ystem.NotSupportedException(\"The previous function is not composable.\")\r\n       " +
@@ -7262,7 +7262,7 @@ this.Write("End Namespace\r\n");
         /// </summary>
         public class ToStringInstanceHelper
         {
-            private System.IFormatProvider formatProviderField  = global::System.Globalization.CultureInfo.InvariantCulture;
+            private System.IFormatProvider formatProviderField  = global::System.Globalization.CultureInfo.CurrentCulture;
             /// <summary>
             /// Gets or sets format provider to be used by ToStringWithCulture method.
             /// </summary>

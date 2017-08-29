@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using System;
-using System.Globalization;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-using System.Xml;
 using Microsoft.OData.ConnectedService.Common;
 using Microsoft.OData.ConnectedService.Models;
 using Microsoft.OData.ConnectedService.Views;
 using Microsoft.VisualStudio.ConnectedServices;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Security;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace Microsoft.OData.ConnectedService.ViewModels
 {
@@ -76,12 +77,16 @@ namespace Microsoft.OData.ConnectedService.ViewModels
                 }
             }
 
+            // Set up XML secure resolver
+            XmlUrlResolver xmlUrlResolver = new XmlUrlResolver()
+            {
+                Credentials = CredentialCache.DefaultNetworkCredentials
+            };
+            PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.None);
+
             XmlReaderSettings readerSettings = new XmlReaderSettings()
             {
-                XmlResolver = new XmlUrlResolver()
-                {
-                    Credentials = CredentialCache.DefaultNetworkCredentials
-                }
+                XmlResolver = new XmlSecureResolver(xmlUrlResolver, permissionSet)
             };
 
             string workFile = Path.GetTempFileName();
@@ -110,7 +115,7 @@ namespace Microsoft.OData.ConnectedService.ViewModels
             }
             catch (WebException e)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Cannot access {0}", this.Endpoint), e);
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Cannot access {0}", this.Endpoint), e);
             }
         }
     }

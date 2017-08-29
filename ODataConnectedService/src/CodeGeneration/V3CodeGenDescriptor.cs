@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
+using EnvDTE;
+using Microsoft.OData.ConnectedService.Common;
+using Microsoft.VisualStudio.ConnectedServices;
 using System;
 using System.Data.Services.Design;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using EnvDTE;
-using Microsoft.OData.ConnectedService.Common;
-using Microsoft.VisualStudio.ConnectedServices;
 
 namespace Microsoft.OData.ConnectedService.CodeGeneration
 {
@@ -60,12 +61,16 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
             generator.UseDataServiceCollection = this.ServiceConfiguration.UseDataServiceCollection;
             generator.Version = DataServiceCodeVersion.V3;
 
+            // Set up XML secure resolver
+            XmlUrlResolver xmlUrlResolver = new XmlUrlResolver()
+            {
+                Credentials = System.Net.CredentialCache.DefaultNetworkCredentials
+            };
+            PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.None);
+
             XmlReaderSettings settings = new XmlReaderSettings()
             {
-                XmlResolver = new XmlUrlResolver()
-                {
-                    Credentials = System.Net.CredentialCache.DefaultNetworkCredentials
-                }
+                XmlResolver = new XmlSecureResolver(xmlUrlResolver, permissionSet)
             };
 
             using (XmlReader reader = XmlReader.Create(this.MetadataUri, settings))
