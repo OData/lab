@@ -237,7 +237,7 @@ public string MetadataDocumentUri
         {
             value = uri.Scheme + "://" + uri.Authority + uri.AbsolutePath;
             value = value.TrimEnd('/');
-            if (!value.EndsWith("$metadata"))
+            if (!value.EndsWith("$metadata", StringComparison.CurrentCulture))
             {
                 value += "/$metadata";
             }
