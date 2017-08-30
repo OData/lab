@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
-using Microsoft.OData.ConnectedService.Common;
-using Microsoft.OData.ConnectedService.Models;
-using Microsoft.OData.ConnectedService.Views;
-using Microsoft.VisualStudio.ConnectedServices;
 using System;
 using System.Globalization;
 using System.IO;
@@ -12,6 +8,10 @@ using System.Net;
 using System.Security;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.OData.ConnectedService.Common;
+using Microsoft.OData.ConnectedService.Models;
+using Microsoft.OData.ConnectedService.Views;
+using Microsoft.VisualStudio.ConnectedServices;
 
 namespace Microsoft.OData.ConnectedService.ViewModels
 {
@@ -82,6 +82,7 @@ namespace Microsoft.OData.ConnectedService.ViewModels
             {
                 Credentials = CredentialCache.DefaultNetworkCredentials
             };
+
             PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.None);
 
             XmlReaderSettings readerSettings = new XmlReaderSettings()
