@@ -67,7 +67,7 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
                 Credentials = System.Net.CredentialCache.DefaultNetworkCredentials
             };
 
-            PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.None);
+            PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.Unrestricted);
 
             XmlReaderSettings settings = new XmlReaderSettings()
             {

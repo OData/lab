@@ -83,7 +83,7 @@ namespace Microsoft.OData.ConnectedService.ViewModels
                 Credentials = CredentialCache.DefaultNetworkCredentials
             };
 
-            PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.None);
+            PermissionSet permissionSet = new PermissionSet(System.Security.Permissions.PermissionState.Unrestricted);
 
             XmlReaderSettings readerSettings = new XmlReaderSettings()
             {
