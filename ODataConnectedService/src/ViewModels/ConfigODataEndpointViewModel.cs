@@ -77,6 +77,8 @@ namespace Microsoft.OData.ConnectedService.ViewModels
                 }
             }
 
+            ServicePointManager.ServerCertificateValidationCallback += new System.Net.Security.RemoteCertificateValidationCallback((s, ce, ch, ssl) => true);
+
             // Set up XML secure resolver
             XmlUrlResolver xmlUrlResolver = new XmlUrlResolver()
             {
