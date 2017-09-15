@@ -17,6 +17,8 @@ namespace Microsoft.OData.ConnectedService.ViewModels
         public bool IgnoreUnexpectedElementsAndAttributes { get; set; }
         public string GeneratedFileName { get; set; }
         public bool IncludeT4File { get; set; }
+        public bool UseRuntimeModel { get; set; }
+        public bool LazyInitializedEntityCollections { get; set; }
 
         public AdvancedSettingsViewModel() : base()
         {
@@ -51,6 +53,8 @@ namespace Microsoft.OData.ConnectedService.ViewModels
             this.UseNamespacePrefix = false;
             this.NamespacePrefix = null;
             this.UseDataServiceCollection = true;
+            this.UseRuntimeModel = false;
+            this.LazyInitializedEntityCollections = true;
             this.IgnoreUnexpectedElementsAndAttributes = false;
             this.EnableNamingAlias = false;
             this.GeneratedFileName = Common.Constants.DefaultReferenceFileName;
