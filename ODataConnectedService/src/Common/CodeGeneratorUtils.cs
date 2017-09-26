@@ -31,7 +31,7 @@ namespace Microsoft.OData.ConnectedService.Common
                 }
             }
 
-            return null;
+            return String.Empty;
         }
     }
 }
