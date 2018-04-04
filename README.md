@@ -14,6 +14,7 @@ This repository is for exploring new ideas and developing early prototypes of va
 * [Source](https://github.com/OData/lab/tree/master/ODataConnectedService)
 * [Visual Studio Extension](https://visualstudiogallery.msdn.microsoft.com/b343d0eb-6493-44c2-b558-13a0408d013f)
 * FAQ
+  
   **Question**: In Visual Studio 2017, upon configuring the service endpoint in the OData Connected Services extension and clicking "Finish", I get an error message that says "Value cannot be null.\r\nParameter name: path1".  
   **Workaround**: Download the [Microsoft WCF ToolKit](https://download.microsoft.com/download/1/C/A/1CAA41C7-88B9-42D6-9E11-3C655656DAB1/WcfDataServices.exe) and install it. Then go to the registry and find the following key: `[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Microsoft WCF Data Services]`. Create a duplicate of "VS 2010 Tooling" (if this doesn't exist, use "5.6" instead) named "VS 2014 Tooling". Then try again. (Special thanks to [mohsenno1](https://github.com/mohsenno1) for pointing this out.)
   
