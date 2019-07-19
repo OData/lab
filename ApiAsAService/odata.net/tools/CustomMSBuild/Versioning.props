@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <!-- Set the version number: major, minor, build and release (i.e. alpha, beta or blank for RTM)-->
+  <PropertyGroup>
+    <VersionMajor Condition="'$(VersionMajor)' == ''">7</VersionMajor>
+    <VersionMinor Condition="'$(VersionMinor)' == ''">6</VersionMinor>
+    <VersionBuildNumber Condition="'$(VersionBuildNumber)' == ''">1</VersionBuildNumber>
+    <VersionRelease Condition="'$(VersionRelease)' == ''">beta</VersionRelease>
+  </PropertyGroup>
+
+  <!--
+      Revision number is a date code. Note that this only work for about 6 years before the year part (year-2017)
+      overflows the Int16. The system convert below will throw errors when this happens.
+    -->
+  <PropertyGroup>
+    <VersionStartYear Condition="'$(VersionStartYear)' == ''">2017</VersionStartYear>
+    <VersionDateCode>$([System.Convert]::ToInt16('$([MSBuild]::Add(1, $([MSBuild]::Subtract($([System.DateTime]::Now.Year), $(VersionStartYear)))))$([System.DateTime]::Now.ToString("MMdd"))'))</VersionDateCode>
+    <VersionRevision Condition="'$(VersionRevision)' == '' OR '$(VersionRevision)' == '0'">$([System.Convert]::ToString($(VersionDateCode)))</VersionRevision>
+  </PropertyGroup>
+
+  <!-- Product Version -->
+  <PropertyGroup>
+    <VersionFullSemantic>$(VersionMajor).$(VersionMinor).$(VersionBuildNumber)</VersionFullSemantic>
+    <VersionFull>$(VersionFullSemantic).$(VersionRevision)</VersionFull>
+  </PropertyGroup>
+
+  <!-- For ADO.NET Provider -->
+  <PropertyGroup Condition="'$(UseOfficeVersion)' == 'true'">
+    <VersionMajor Condition="'$(VersionMajor)' == ''">12</VersionMajor>
+    <VersionMinor Condition="'$(VersionMinor)' == ''">0</VersionMinor>
+    <VersionBuildNumber Condition="'$(VersionBuildNumber)' == ''">0</VersionBuildNumber>
+  </PropertyGroup>
+
+  <!-- For T4 -->
+  <PropertyGroup>
+    <T4VersionMajor>2</T4VersionMajor>
+    <T4VersionMinor>4</T4VersionMinor>
+    <T4VersionBuildNumber>0</T4VersionBuildNumber>
+    <T4VersionFullSemantic>$(T4VersionMajor).$(T4VersionMinor).$(T4VersionBuildNumber)</T4VersionFullSemantic>
+    <VersionT4Semantic>$(T4VersionFullSemantic)</VersionT4Semantic>
+  </PropertyGroup>
+  
+  <!-- For NuGet Packages -->
+  <PropertyGroup>
+    <VersionNuGetSemantic>$(VersionFullSemantic)</VersionNuGetSemantic>
+    <VersionNuGetSemantic Condition="'$(VersionRelease)'!=''">$(VersionFullSemantic)-$(VersionRelease)</VersionNuGetSemantic>
+  </PropertyGroup>
+</Project>

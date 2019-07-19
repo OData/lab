@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Summary>Restier is a framework for building convention-based, secure, queryable APIs with ASP.NET. This package contains runtime components for implementing Restier convention semantics and query interception.</Summary>
+    <Description>
+      $(Summary)
+
+      Commonly used types:
+      Microsoft.Restier.Core.RestierController
+    </Description>
+    <PackageTags>$(PackageTags)</PackageTags>
+
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Exceptions\PreconditionFailedException.cs" />
+    <Compile Remove="Exceptions\PreconditionRequiredException.cs" />
+    <Compile Remove="Exceptions\ResourceNotFoundException.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Microsoft.Restier.AspNet</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Microsoft.Restier.EntityFramework</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Microsoft.Restier.Tests.Core</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
+    <Compile Remove="DataAnnotations\AssociatedMetadataTypeTypeDescriptionProvider.cs" />
+    <Compile Remove="DataAnnotations\AssociatedMetadataTypeTypeDescriptor.cs" />
+    <Compile Remove="DataAnnotations\MetadataPropertyDescriptorWrapper.cs" />
+    <Compile Remove="DataAnnotations\MetadataTypeAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[2.2.0, 3.0.0)" />
+    <PackageReference Include="Microsoft.OData.Core" Version="[7.6.0, 8.0.0)" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="[4.5.0, 5.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\WebAPI\src\Microsoft.AspNet.OData\Microsoft.AspNet.OData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>Microsoft.Restier.Core</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.CodeQuality.Analyzers" Version="[2.9.3, 3.0.0)" />
+  </ItemGroup>
+
+</Project>
