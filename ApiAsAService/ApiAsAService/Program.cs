@@ -5,8 +5,12 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Microsoft.Owin.Hosting;
 using Owin;
+using todo;
 
 namespace DynamicEdmModelCreation
 {
@@ -16,6 +20,8 @@ namespace DynamicEdmModelCreation
 
         public static void Main(string[] args)
         {
+            GetTrippin().Wait();
+
             using (WebApp.Start(serviceUrl, Configuration))
             {
                 Console.WriteLine("Server listening at {0}", serviceUrl);
@@ -25,6 +31,16 @@ namespace DynamicEdmModelCreation
                 Console.WriteLine("Press Any Key to Exit ...");
                 Console.ReadKey();
             }
+        }
+
+        public static async Task GetTrippin()
+        {
+            DocumentDBRepository<Item>.Initialize();
+            var item = await DocumentDBRepository<Item>.GetSchema(("trippinschema"));
+            Console.Write(item.csdl);
+            Console.WriteLine("\nDone fetching the schema");
+            Console.ReadKey();
+            return;
         }
 
         private static async Task QueryTheService()
