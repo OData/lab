@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNet.OData.Batch;
 using Microsoft.AspNet.OData.Extensions;
