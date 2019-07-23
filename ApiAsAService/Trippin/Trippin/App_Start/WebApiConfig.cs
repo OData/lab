@@ -20,11 +20,14 @@ namespace Microsoft.OData.Service.ApiAsAService
         {
             // enable query options for all properties
             config.Filter().Expand().Select().OrderBy().MaxTop(null).Count();
-            await config.MapRestierRoute<DynamicApi>(
+            await config.MapRestierRoute<DynamicApi<Models.TrippinModel>>(
                 "ApiAsAService", "",
                 new RestierBatchHandler(server));
         }
 
-        
+        private static void MapRestierRoute(System.Type modelType)
+        {
+
+        }
     }
 }

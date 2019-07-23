@@ -17,12 +17,15 @@ using Microsoft.Restier.Core.Model;
 using Microsoft.Restier.Core.Submit;
 using Microsoft.Restier.EntityFramework;
 using Microsoft.Restier.AspNet.Model;
+using Microsoft.OData.Edm.Csdl;
+using System.Xml;
+using Microsoft.OData.Edm.Validation;
 
 namespace Microsoft.OData.Service.ApiAsAService.Api
 {
-    public class DynamicApi : EntityFrameworkApi<TrippinModel>
+    public class DynamicApi<T> : EntityFrameworkApi<T> where T : System.Data.Entity.DbContext
     {
-        public TrippinModel ModelContext { get { return DbContext; } }
+        public T ModelContext { get { return DbContext; } }
 
         //[Resource]
         //public Person Me
@@ -154,7 +157,7 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
                 MaxExpansionDepth = 3
             };
 
-            IServiceCollection serviceCollection = EntityFrameworkApi<TrippinModel>.ConfigureApi(apiType, services)
+            IServiceCollection serviceCollection = EntityFrameworkApi<T>.ConfigureApi(apiType, services)
                 .AddSingleton<ODataPayloadValueConverter, CustomizedPayloadValueConverter>()
                 .AddSingleton<ODataValidationSettings>(validationSettingFactory)
                 .AddService<IChangeSetItemFilter, CustomizedSubmitProcessor>()
@@ -170,45 +173,19 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
 
             public async Task<IEdmModel> GetModelAsync(ModelContext context, CancellationToken cancellationToken)
             {
-                EdmModel model = new EdmModel();
-                EdmEntityContainer container = new EdmEntityContainer("Microsoft.OData.Service.ApiAsAService.Models", "container");
-                model.AddElement(container);
+                //return await InnerHandler.GetModelAsync(context, cancellationToken);
+                IEdmModel model;
+                IEnumerable<EdmError> errors;
+                var appData = System.Web.HttpContext.Current.Server.MapPath("~/App_Data");
+                var file = System.IO.Path.Combine(appData, "Trippin.xml");
 
-                EdmEntityType person = new EdmEntityType("Microsoft.OData.Service.ApiAsAService.Models", "Person");
-                person.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
-                EdmStructuralProperty key = person.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32);
-                person.AddKeys(key);
-                model.AddElement(person);
-                EdmEntitySet people = container.AddEntitySet("People", person);
+                XmlReader xmlReader = XmlReader.Create(file);
+                if (CsdlReader.TryParse(xmlReader, out model, out errors))
+                {
+                    return model;
+                }
 
-                EdmEntityType detailInfo = new EdmEntityType("Microsoft.OData.Service.ApiAsAService.Models", "DetailInfo");
-                detailInfo.AddKeys(detailInfo.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
-                detailInfo.AddStructuralProperty("Title", EdmPrimitiveTypeKind.String);
-                model.AddElement(detailInfo);
-                EdmEntitySet detailInfos = container.AddEntitySet("DetailInfos", person);
-
-                EdmNavigationProperty detailInfoNavProp = person.AddUnidirectionalNavigation(
-                    new EdmNavigationPropertyInfo
-                    {
-                        Name = "DetailInfo",
-                        TargetMultiplicity = EdmMultiplicity.One,
-                        Target = detailInfo
-                    });
-                people.AddNavigationTarget(detailInfoNavProp, detailInfos);
-
-                  //var model = await InnerHandler.GetModelAsync(context, cancellationToken);
-
-                //// Set computed annotation
-                //var tripType = (EdmEntityType)model.SchemaElements.Single(e => e.Name == "Trip");
-                //var trackGuidProperty = tripType.DeclaredProperties.Single(prop => prop.Name == "TrackGuid");
-                //var timeStampValueProp= model.EntityContainer.FindEntitySet("Airlines").EntityType().FindProperty("TimeStampValue");
-                //var term = new EdmTerm("Org.OData.Core.V1", "Computed", EdmPrimitiveTypeKind.Boolean);
-                //var anno1 = new EdmVocabularyAnnotation(trackGuidProperty, term, new EdmBooleanConstant(true));
-                //var anno2 = new EdmVocabularyAnnotation(timeStampValueProp, term, new EdmBooleanConstant(true));
-                //((EdmModel)model).SetVocabularyAnnotation(anno1);
-                //((EdmModel)model).SetVocabularyAnnotation(anno2);
-
-                return model;
+                throw new Exception("Couldn't parse xml");
             }
         }
 
