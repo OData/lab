@@ -8,7 +8,6 @@
     {
         public static void BuildProperty(TypeBuilder typeBuilder,  string fieldName, Type fieldType)
         {
-
             FieldBuilder fieldBldr = typeBuilder.DefineField(fieldName,
                                                             fieldType,
                                                             FieldAttributes.Private);

@@ -14,15 +14,30 @@ namespace EdmLoadTester
         {
             try
             {
-                var add = new Address(){City = "Redmond"};
-                var entities = new Entities();
+                using (var context = new Entities())
+                {
+                    var address = context.Supplier.Create();
+                    address.Concurrency = 2;
+                }
+
+                using (var context = new Entities())
+                {
+                    var address = context.Supplier.ToList();
+                    if (address.Count != 1)
+                    {
+                        throw new Exception("Error");
+                    }
+
+                    var isTrue = address.FirstOrDefault().Concurrency.Equals(2);
+                }
+
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-           
+
         }
     }
 }

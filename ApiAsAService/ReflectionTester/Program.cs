@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ReflectionTester
 {
     using System.Data.Entity;
+    using System.Data.Entity.Infrastructure;
     using System.IO;
     using System.Reflection;
     using System.Reflection.Emit;
@@ -25,6 +26,7 @@ namespace ReflectionTester
         public class TypeBuilderInfo
         {
             public bool IsDerived { get; set; }
+            public bool IsStructured { get; set; }
             public TypeBuilder Builder { get; set; }
         }
 
@@ -54,25 +56,25 @@ namespace ReflectionTester
             IList<string> baseProps = new List<string>();
             foreach (var modelSchemaElement in model.SchemaElements)
             {
-                var one = model.FindDeclaredType(modelSchemaElement.FullName());
+                var declaredType = model.FindDeclaredType(modelSchemaElement.FullName());
 
-                if (one is IEdmStructuredType)
+                if (declaredType is IEdmStructuredType)
                 {
-                    if (one is IEdmEntityType)
+                    if (declaredType is IEdmEntityType)
                     {
 
-                        var two = model.FindDirectlyDerivedTypes((IEdmStructuredType)one);
-                        if (two.Any())
+                        var derivedTypes = model.FindDirectlyDerivedTypes((IEdmStructuredType)declaredType);
+                        if (derivedTypes.Any())
                         {
-                            baseProps.Add(one.FullName());
-                            Compile((IEdmStructuredType)one, moduleBuilder, one.FullName());
+                            baseProps.Add(declaredType.FullName());
+                            Compile((IEdmStructuredType)declaredType, moduleBuilder, declaredType.FullName());
                         }
                     }
                     else
                     {
-                        baseProps.Add(one.FullName());
-                        Compile((IEdmStructuredType)one, moduleBuilder, one.FullName());
-
+                        baseProps.Add(declaredType.FullName());
+                        Compile((IEdmStructuredType)declaredType, moduleBuilder, declaredType.FullName());
+                        _typeBuildersDict[declaredType.FullName()].IsStructured = true;
                     }
 
                 }
@@ -119,10 +121,25 @@ namespace ReflectionTester
 
             foreach (var typeBuilderInfo in _typeBuildersDict)
             {
-                Type listOf = typeof(DbSet<>);
-                Type selfContained = listOf.MakeGenericType(typeBuilderInfo.Value.Builder);
-                PropertyBuilderHelper.BuildProperty(entitiesBuilder, typeBuilderInfo.Key.Split('.')[1], selfContained);
+                if (!typeBuilderInfo.Value.IsStructured)
+                {
+                    Type listOf = typeof(DbSet<>);
+                    Type selfContained = listOf.MakeGenericType(typeBuilderInfo.Value.Builder);
+                    PropertyBuilderHelper.BuildProperty(entitiesBuilder, typeBuilderInfo.Key.Split('.')[1], selfContained);
+                }
+               
             }
+            // create the Main(string[] args) method
+            MethodBuilder methodbuilder = entitiesBuilder.DefineMethod("OnModelCreating", MethodAttributes.Public
+                                                                                          | MethodAttributes.HideBySig
+                                                                                          | MethodAttributes.CheckAccessOnOverride
+                                                                                          | MethodAttributes.Virtual,
+                                                                                          typeof(void), new Type[] { typeof(DbModelBuilder) });
+
+            // generate the IL for the Main method
+            ILGenerator ilGenerator = methodbuilder.GetILGenerator();
+            ilGenerator.ThrowException(typeof(UnintentionalCodeFirstException));
+            ilGenerator.Emit(OpCodes.Ret);
             entitiesBuilder.CreateType();
 
 
@@ -171,12 +188,6 @@ namespace ReflectionTester
                 }
             }
 
-
-
-
-
-
-
         }
 
         internal static void GenerateProperty(IEdmProperty property, TypeBuilder typeBuilder, ModuleBuilder moduleBuilder)
@@ -211,40 +222,18 @@ namespace ReflectionTester
                 }
                 else
                 {
+                   
                     var previouslyBuiltType = moduleBuilder.GetType(property.Type.FullName());
                     propertyType = previouslyBuiltType;
                 }
-
-
+            }
+            if (property.Type.IsNullable && Nullable.GetUnderlyingType(propertyType)!=null)
+            {
+                Type nullableOf = typeof(Nullable<>);
+                Type selfContained = nullableOf.MakeGenericType(propertyType);
+                propertyType = selfContained;
             }
             PropertyBuilderHelper.BuildProperty(typeBuilder, propertyName, propertyType);
-            //var field = typeBuilder.DefineField(propertyName, propertyType, FieldAttributes.Private);
-            //var propertyBuilder = typeBuilder.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
-
-            //// Generate getter method
-
-            //var getter = typeBuilder.DefineMethod("Get", MethodAttributes.Public, propertyType, Type.EmptyTypes);
-
-            //var il = getter.GetILGenerator();
-
-            //il.Emit(OpCodes.Ldarg_0);        // Push &quot;this&quot; on the stack
-            //il.Emit(OpCodes.Ldfld, field);   // Load the field &quot;_Name&quot;
-            //il.Emit(OpCodes.Ret);            // Return
-
-            //propertyBuilder.SetGetMethod(getter);
-
-            //// Generate setter method
-
-            //var setter = typeBuilder.DefineMethod("Set", MethodAttributes.Public, null, new[] { propertyType });
-
-            //il = setter.GetILGenerator();
-
-            //il.Emit(OpCodes.Ldarg_0);        // Push &quot;this&quot; on the stack
-            //il.Emit(OpCodes.Ldarg_1);        // Push &quot;value&quot; on the stack
-            //il.Emit(OpCodes.Stfld, field);   // Set the field &quot;_Name&quot; to &quot;value&quot;
-            //il.Emit(OpCodes.Ret);            // Return
-
-            //propertyBuilder.SetSetMethod(setter);
         }
 
         /// <summary>
@@ -299,19 +288,17 @@ namespace ReflectionTester
         static void Main(string[] args)
         {
             var model = ReadModel(@"C:\repos\fun\lab\ApiAsAService\EdmHelperTest\NW_Simple.xml");
-
+            var name = "NW_Simple";
 
             // create a dynamic assembly and module 
             AssemblyName assemblyName = new AssemblyName();
-            assemblyName.Name = "HelloWorld";
+            assemblyName.Name = name;
             AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
             ModuleBuilder module;
-            module = assemblyBuilder.DefineDynamicModule("HelloWorld.exe");
+            module = assemblyBuilder.DefineDynamicModule($"{assemblyName.Name}.dll");
             BuildModules(model, module);
 
-            assemblyBuilder.Save("HelloWorld.exe");
+            assemblyBuilder.Save($"{assemblyName.Name}.dll");
         }
-
-
     }
 }
