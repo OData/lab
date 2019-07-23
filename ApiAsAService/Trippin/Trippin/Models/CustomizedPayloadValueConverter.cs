@@ -3,7 +3,7 @@
 
 using Microsoft.OData.Edm;
 
-namespace Microsoft.OData.Service.Sample.Trippin.Models
+namespace Microsoft.OData.Service.ApiAsAService.Models
 {
     /// <summary>
     /// The customized payload value converter for test only

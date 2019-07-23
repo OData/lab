@@ -4,7 +4,7 @@
 using System.Web;
 using System.Web.Http;
 
-namespace Microsoft.OData.Service.Sample.Trippin
+namespace Microsoft.OData.Service.ApiAsAService
 {
     public class WebApiApplication : HttpApplication
     {

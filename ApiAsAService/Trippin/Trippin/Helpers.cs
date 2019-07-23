@@ -10,7 +10,7 @@ using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.OData.Service.Sample.Trippin
+namespace Microsoft.OData.Service.ApiAsAService
 {
     public static class Helpers
     {

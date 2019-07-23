@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 
-namespace Microsoft.OData.Service.Sample.Trippin.Models
+namespace Microsoft.OData.Service.ApiAsAService.Models
 {
     public class TrippinModel : DbContext
     {

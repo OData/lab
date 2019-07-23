@@ -3,26 +3,28 @@
 
 using System.Web.Http;
 using Microsoft.AspNet.OData.Extensions;
-using Microsoft.OData.Service.Sample.Trippin.Api;
+using Microsoft.OData.Service.ApiAsAService.Api;
 using Microsoft.Restier.AspNet.Batch;
 
-namespace Microsoft.OData.Service.Sample.Trippin
+namespace Microsoft.OData.Service.ApiAsAService
 {
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
         {
-            RegisterTrippin(config, GlobalConfiguration.DefaultServer);
+            RegisterService(config, GlobalConfiguration.DefaultServer);
         }
 
-        public static async void RegisterTrippin(
+        public static async void RegisterService(
             HttpConfiguration config, HttpServer server)
         {
             // enable query options for all properties
             config.Filter().Expand().Select().OrderBy().MaxTop(null).Count();
-            await config.MapRestierRoute<TrippinApi>(
-                "TrippinApi", "",
+            await config.MapRestierRoute<DynamicApi>(
+                "ApiAsAService", "",
                 new RestierBatchHandler(server));
         }
+
+        
     }
 }

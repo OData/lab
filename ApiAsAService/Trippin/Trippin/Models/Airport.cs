@@ -3,7 +3,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Microsoft.OData.Service.Sample.Trippin.Models
+namespace Microsoft.OData.Service.ApiAsAService.Models
 {
     public class Airport
     {

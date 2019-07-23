@@ -216,7 +216,8 @@ namespace Microsoft.Restier.Core
             services.AddScoped(apiType, apiType)
                 .AddScoped(typeof(ApiBase), apiType);
 
-            services.TryAddSingleton<ApiConfiguration>();
+            //services.TryAddSingleton<ApiConfiguration>();
+            services.TryAddScoped<ApiConfiguration>();
 
             return services.AddService<IQueryExecutor, DefaultQueryExecutor>()
                             .AddScoped<PropertyBag>();
