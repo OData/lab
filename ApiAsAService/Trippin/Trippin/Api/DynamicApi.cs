@@ -20,6 +20,13 @@ using Microsoft.Restier.AspNet.Model;
 using Microsoft.OData.Edm.Csdl;
 using System.Xml;
 using Microsoft.OData.Edm.Validation;
+using Microsoft.AspNet.OData.Routing;
+using System.Web.Http;
+using Microsoft.Restier.AspNet.Batch;
+using Microsoft.Restier.AspNet;
+using Microsoft.AspNet.OData.Extensions;
+using Microsoft.AspNet.OData.Batch;
+using Microsoft.AspNet.OData.Routing.Conventions;
 
 namespace Microsoft.OData.Service.ApiAsAService.Api
 {
@@ -27,133 +34,12 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
     {
         public T ModelContext { get { return DbContext; } }
 
-        //[Resource]
-        //public Person Me
-        //{
-        //    get
-        //    {
-        //        return DbContext.People
-        //            .Include("Friends")
-        //            .Include("Trips")
-        //            .Single(p => p.PersonId == 1);
-        //    }
-        //}
-
-        //private IQueryable<Person> PeopleWithFriends
-        //{
-        //    get { return ModelContext.People.Include("Friends"); }
-        //}
-
-        ///// <summary>
-        ///// Implements an action import.
-        ///// </summary>
-        //[Operation(Namespace = "Microsoft.OData.Service.ApiAsAService.Models", HasSideEffects = true)]
-        //public void ResetDataSource()
-        //{
-        //    TrippinModel.ResetDataSource();
-        //}
-
-        ///// <summary>
-        ///// Action import - clean up all the expired trips.
-        ///// </summary>
-        //[Operation(Namespace = "Microsoft.OData.Service.ApiAsAService.Models", HasSideEffects = true)]
-        //public void CleanUpExpiredTrips()
-        //{
-        //    // DO NOT ACTUALLY REMOVE THE TRIPS.
-        //}
-
-        ///// <summary>
-        ///// Bound action - set the end-up time of a trip.
-        ///// </summary>
-        ///// <param name="trip">The trip to update.</param>
-        ///// <returns>The trip updated.</returns>
-        //[Operation(Namespace = "Microsoft.OData.Service.ApiAsAService.Models", IsBound = true, HasSideEffects = true)]
-        //public Trip EndTrip(Trip trip)
-        //{
-        //    // DO NOT ACTUALLY UPDATE THE TRIP.
-        //    return trip;
-        //}
-
-        ///// <summary>
-        ///// Bound function - gets the number of friends of a person.
-        ///// </summary>
-        ///// <param name="person">The key of the binding person.</param>
-        ///// <returns>The number of friends of the person.</returns>
-        //[Operation(Namespace = "Microsoft.OData.Service.ApiAsAService.Models", IsBound = true)]
-        //public int GetNumberOfFriends(Person person)
-        //{
-        //    if (person == null)
-        //    {
-        //        return 0;
-        //    }
-
-        //    var personWithFriends = PeopleWithFriends.Single(p => p.PersonId == person.PersonId);
-        //    return personWithFriends.Friends == null ? 0 : personWithFriends.Friends.Count;
-        //}
-
-        ///// <summary>
-        ///// Function import - gets the person with most friends.
-        ///// </summary>
-        ///// <returns>The person with most friends.</returns>
-        //[Operation(Namespace = "Microsoft.OData.Service.ApiAsAService.Models", EntitySet = "People")]
-        //public Person GetPersonWithMostFriends()
-        //{
-        //    Person result = null;
-
-        //    foreach (var person in PeopleWithFriends)
-        //    {
-        //        if (person.Friends == null)
-        //        {
-        //            continue;
-        //        }
-
-        //        if (result == null)
-        //        {
-        //            result = person;
-        //        }
-
-        //        if (person.Friends.Count > result.Friends.Count)
-        //        {
-        //            result = person;
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
-        ///// <summary>
-        ///// Function import - gets people with at least n friends.
-        ///// </summary>
-        ///// <param name="n">The minimum number of friends.</param>
-        ///// <returns>People with at least n friends.</returns>
-        //[Operation(Namespace = "Microsoft.OData.Service.ApiAsAService.Models", EntitySet = "People")]
-        //public IEnumerable<Person> GetPeopleWithFriendsAtLeast(int n)
-        //{
-        //    foreach (var person in PeopleWithFriends)
-        //    {
-        //        if (person.Friends == null)
-        //        {
-        //            continue;
-        //        }
-
-        //        if (person.Friends.Count >= n)
-        //        {
-        //            yield return person;
-        //        }
-        //    }
-        //}
-
-        //protected bool CanDeleteTrips()
-        //{
-        //    return false;
-        //}
-
-        public static new IServiceCollection ConfigureApi(Type apiType, IServiceCollection services)
+         public static new IServiceCollection ConfigureApi(Type apiType, IServiceCollection services)
         {
             // Add customized OData validation settings 
             Func<IServiceProvider, ODataValidationSettings> validationSettingFactory = (sp) => new ODataValidationSettings
             {
-                MaxAnyAllExpressionDepth =3,
+                MaxAnyAllExpressionDepth = 3,
                 MaxExpansionDepth = 3
             };
 
@@ -173,7 +59,6 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
 
             public async Task<IEdmModel> GetModelAsync(ModelContext context, CancellationToken cancellationToken)
             {
-                //return await InnerHandler.GetModelAsync(context, cancellationToken);
                 IEdmModel model;
                 IEnumerable<EdmError> errors;
                 var appData = System.Web.HttpContext.Current.Server.MapPath("~/App_Data");
@@ -193,4 +78,4 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
         {
         }
     }
- }
+}

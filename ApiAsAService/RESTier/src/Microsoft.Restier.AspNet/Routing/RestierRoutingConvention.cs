@@ -19,7 +19,7 @@ namespace Microsoft.Restier.AspNet
     /// </summary>
     internal class RestierRoutingConvention : IODataRoutingConvention
     {
-        private const string RestierControllerName = "Restier";
+        private const string RestierControllerName = "DynamicApi";
         private const string MethodNameOfGet = "Get";
         private const string MethodNameOfPost = "Post";
         private const string MethodNameOfPut = "Put";

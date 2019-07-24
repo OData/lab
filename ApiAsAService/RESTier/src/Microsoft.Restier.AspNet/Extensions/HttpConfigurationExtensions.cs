@@ -75,7 +75,7 @@ namespace System.Web.Http
         /// <param name="config">The <see cref="HttpConfiguration"/> instance.</param>
         /// <param name="routeName">The name of the route.</param>
         /// <returns>The routing conventions created.</returns>
-        private static IList<IODataRoutingConvention> CreateRestierRoutingConventions(
+        internal static IList<IODataRoutingConvention> CreateRestierRoutingConventions(
             this HttpConfiguration config, string routeName)
         {
             var conventions = ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config);

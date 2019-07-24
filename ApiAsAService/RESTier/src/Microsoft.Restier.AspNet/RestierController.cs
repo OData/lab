@@ -63,11 +63,19 @@ namespace Microsoft.Restier.AspNet
         }
 
         /// <summary>
+        /// new method for derived class to set the API
+        /// </summary>
+        protected void SetApi(ApiBase api)
+        {
+            this.api = api;
+        }
+
+        /// <summary>
         /// Handles a GET request to query entities.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The task object that contains the response message.</returns>
-        public async Task<HttpResponseMessage> Get(CancellationToken cancellationToken)
+        protected async Task<HttpResponseMessage> GetResponse(CancellationToken cancellationToken)
         {
             var path = GetPath();
             var lastSegment = path.Segments.LastOrDefault();
