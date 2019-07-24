@@ -18,7 +18,7 @@ namespace Microsoft.Restier.Core
     public class RestierContainerBuilder : IContainerBuilder
     {
         private readonly IServiceCollection services = new ServiceCollection();
-        private readonly Type apiType;
+        private Type apiType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RestierContainerBuilder" /> class.
@@ -110,7 +110,7 @@ namespace Microsoft.Restier.Core
                 apiType, services
             });
 
-            services.AddSingleton(modelFactory);
+            services.AddScoped(modelFactory);
             return this;
         }
 

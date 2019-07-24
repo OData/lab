@@ -3,12 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http.Routing;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
+using Microsoft.OData.Service.ApiAsAService.Api;
+using Microsoft.Restier.AspNet;
+using Microsoft.Restier.Core;
+using Microsoft.Restier.Core.Model;
 
 namespace Microsoft.OData.Service.ApiAsAService
 {
@@ -37,21 +42,42 @@ namespace Microsoft.OData.Service.ApiAsAService
 
             if (routeDirection == HttpRouteDirection.UriResolution)
             {
-                if (values.TryGetValue(ODataRouteConstants.ODataPath, out object oDataPathValue))
+                string oDataPathString;
+                if (values.TryGetValue(ODataRouteConstants.ODataPath, out object oDataPathValue) && !String.IsNullOrEmpty(oDataPathString = oDataPathValue as string))
                 {
-                    string oDataPathString = oDataPathValue as string;
                     ODataPath path;
 
                     try
                     {
-                        IServiceProvider requestContainer = request.CreateRequestContainer(this.RouteName);
+                        string[] segments = oDataPathString.Split('/');
+                        string dataSourceName = segments[0];
+                        
+                        IServiceProvider serviceProvider = request.CreateRequestContainer(this.RouteName);
+
                         //IHttpRequestMessageProvider httpRequestMessageProvider = requestContainer.GetRequiredService<IHttpRequestMessageProvider>();
                         //httpRequestMessageProvider.Request = request;
-                        
-                        string[] segments = oDataPathString.Split('/');
-                        string dataSource = segments[0];
-                        request.Properties[DataSourceNameProperty] = dataSource;
+                        Type dynamicType;
+                        switch (dataSourceName)
+                        {
+                            case "Trippin":
+                                dynamicType = typeof(Models.TrippinModel);
+                                break;
+                            case "NWind":
+                                dynamicType = typeof(ODataDemo.NWModel);
+                                break;
+                            default:
+                                throw new Exception("Service not found"); //return request.CreateErrorResponse(HttpStatusCode.NotFound, String.Format("Service {0} not found.", dataSourceName));
+                        }
 
+                        ApiFactory factory = serviceProvider.GetRequiredService<ApiFactory>();
+                        factory.ModelType = dynamicType;
+
+                        DynamicModelBuilder modelBuilder = serviceProvider.GetRequiredService<IModelBuilder>() as DynamicModelBuilder;
+                        if (modelBuilder != null)
+                        {
+                            modelBuilder.DataSourceName = segments[0];
+                        }
+                
                         // Service root is the current RequestUri, less the query string and the ODataPath (always the
                         // last portion of the absolute path).  ODL expects an escaped service root and other service
                         // root calculations are calculated using AbsoluteUri (also escaped).  But routing exclusively
@@ -91,9 +117,10 @@ namespace Microsoft.OData.Service.ApiAsAService
                             serviceRoot = serviceRoot.Substring(0, serviceRoot.Length - 3);
                         }
 
-                        IODataPathHandler pathHandler = requestContainer.GetRequiredService<IODataPathHandler>();
-                        oDataPathAndQuery = oDataPathAndQuery.Substring(oDataPathAndQuery.IndexOf('/') + 1);
-                        path = pathHandler.Parse(serviceRoot, oDataPathAndQuery, requestContainer);
+                        IODataPathHandler pathHandler = serviceProvider.GetRequiredService<IODataPathHandler>();
+                        int slashIndex = oDataPathAndQuery.IndexOf('/');
+                        oDataPathAndQuery = slashIndex < 0 ? "" : oDataPathAndQuery.Substring(slashIndex + 1);
+                        path = pathHandler.Parse(serviceRoot, oDataPathAndQuery, serviceProvider);
                     }
                     catch (ODataException)
                     {

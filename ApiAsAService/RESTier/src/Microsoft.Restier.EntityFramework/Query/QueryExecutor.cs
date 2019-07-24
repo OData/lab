@@ -25,8 +25,11 @@ namespace Microsoft.Restier.EntityFramework
     /// This class only executes queries against EF provider, it'll
     /// delegate other queries to inner IQueryExecutor.
     /// </summary>
-    internal class QueryExecutor : IQueryExecutor
+    public class QueryExecutor : IQueryExecutor
     {
+        /// <summary>
+        /// Inner Executor
+        /// </summary>
         public IQueryExecutor Inner { get; set; }
 
         /// <summary>
@@ -56,7 +59,9 @@ namespace Microsoft.Restier.EntityFramework
 #if EF7
             if (query.Provider is IAsyncQueryProvider)
 #else
+#pragma warning disable CA1062 // Validate arguments of public methods
             if (query.Provider is IDbAsyncQueryProvider)
+#pragma warning restore CA1062 // Validate arguments of public methods
 #endif
             {
                 return new QueryResult(await query.ToArrayAsync(cancellationToken).ConfigureAwait(false));

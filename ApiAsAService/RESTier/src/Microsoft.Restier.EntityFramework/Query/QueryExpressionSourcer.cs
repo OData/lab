@@ -18,7 +18,7 @@ namespace Microsoft.Restier.EntityFramework
     /// <summary>
     /// Represents a query expression sourcer that uses a DbContext.
     /// </summary>
-    internal class QueryExpressionSourcer : IQueryExpressionSourcer
+    public class QueryExpressionSourcer : IQueryExpressionSourcer
     {
         /// <summary>
         /// Sources an expression.
@@ -36,7 +36,9 @@ namespace Microsoft.Restier.EntityFramework
         {
             Ensure.NotNull(context, nameof(context));
 
+#pragma warning disable CA1062 // Validate arguments of public methods
             if (context.ModelReference.EntitySet == null)
+#pragma warning restore CA1062 // Validate arguments of public methods
             {
                 // EF provider can only source *ResourceSet*.
                 return null;

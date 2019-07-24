@@ -16,6 +16,7 @@ namespace Microsoft.OData.Service.ApiAsAService
             RegisterService(config, GlobalConfiguration.DefaultServer);
         }
 
+        private const string RouteName = "DynamicRoute";
         public static async void RegisterService(
             HttpConfiguration config, HttpServer server)
         {
@@ -25,24 +26,17 @@ namespace Microsoft.OData.Service.ApiAsAService
             //    "ApiAsAService", "",
             //    new RestierBatchHandler(server));
 
-            HttpConfiguration dummyConfig = new HttpConfiguration();
-            var services = dummyConfig.Services;
+            //ODataRoute route = await DynamicHelper.MapDynamicRoute(
+            //    typeof(Models.TrippinModel), 
+            //    config, 
+            //    RouteName, 
+            //    "", 
+            //    null);
 
-            ODataRoute route = await DynamicHelper.MapDynamicRoute(
-                typeof(Models.TrippinModel), 
-                dummyConfig, 
-                "RestierRoute", 
-                "", 
-                null);
-
-            foreach(var service in dummyConfig.Services.GetServices(typeof(object)))
-            {
-                config.Services.Add(service.GetType(), service);
-            }
-
-            DynamicODataRoute odataRoute = new DynamicODataRoute(route.RoutePrefix, new DynamicRouteConstraint("RestierRoute"));
-   //         config.Routes.Remove("RestierRoute");
-            config.Routes.Add("DynamicRoute", odataRoute);
+            //config.Routes.Add(RouteName, route);
+            ODataRoute route = await DynamicHelper.MapRestierRoute<DynamicApi>(config, RouteName, null);
+            DynamicODataRoute odataRoute = new DynamicODataRoute(route.RoutePrefix, new DynamicRouteConstraint(RouteName));
+            config.Routes.Add(RouteName, odataRoute);
         }
     }
 }

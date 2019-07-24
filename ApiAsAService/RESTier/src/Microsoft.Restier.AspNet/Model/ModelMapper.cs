@@ -47,7 +47,7 @@ namespace Microsoft.Restier.AspNet.Model
             if (element != null)
             {
                 IEdmType entityType = null;
-                var entitySet = element as EdmEntitySet;
+                var entitySet = element as IEdmEntitySet;
                 if (entitySet != null)
                 {
                     var entitySetType = entitySet.Type as EdmCollectionType;

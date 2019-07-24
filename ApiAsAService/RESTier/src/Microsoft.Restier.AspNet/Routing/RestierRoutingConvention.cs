@@ -208,4 +208,20 @@ namespace Microsoft.Restier.AspNet
             return false;
         }
     }
+
+    /// <summary>
+    /// Class to create an instance of a RestierRoutingConvention
+    /// </summary>
+    public static class RestierRoutingConventionFactory
+    {
+        /// <summary>
+        /// Method to create an instance of a RestierRoutingConvention
+        /// </summary>
+        /// <returns></returns>
+        public static IODataRoutingConvention Create()
+        {
+            return new RestierRoutingConvention();
+        }
+
+    }
 }

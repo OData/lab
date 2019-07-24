@@ -45,12 +45,15 @@ namespace Microsoft.Restier.AspNet.Model
 
             // The model builder must maintain a singleton life time, for holding states and being injected into
             // some other services.
-            services.AddSingleton(new RestierModelExtender(targetType));
+            services.AddScoped(sp=>new RestierModelExtender(sp.GetRequiredService<ApiFactory>().GetApiBase().GetType()));
 
-            services.AddService<IModelBuilder, ModelBuilder>();
-            services.AddService<IModelMapper, ModelMapper>();
-            services.AddService<IQueryExpressionExpander, QueryExpressionExpander>();
-            services.AddService<IQueryExpressionSourcer, QueryExpressionSourcer>();
+            services.AddScoped<IModelBuilder, ModelBuilder>();
+// //           services.AddScoped<IModelMapper, ModelMapper>();
+ //           services.AddScoped<IQueryExpressionExpander, QueryExpressionExpander>();
+//            services.AddScoped<IQueryExpressionSourcer, QueryExpressionSourcer>();
+            //services.AddScoped<IModelMapper>(sp => new ModelMapper(new RestierModelExtender(sp.GetRequiredService<ApiFactory>().GetApiBase().GetType())));
+            //services.AddScoped<IQueryExpressionExpander>(sp => new QueryExpressionExpander(new RestierModelExtender(sp.GetRequiredService<ApiFactory>().GetApiBase().GetType())));
+            //services.AddScoped<IQueryExpressionSourcer>(sp => new QueryExpressionSourcer(new RestierModelExtender(sp.GetRequiredService<ApiFactory>().GetApiBase().GetType()));
         }
 
         private static bool IsEntitySetProperty(PropertyInfo property)

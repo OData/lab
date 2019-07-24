@@ -451,7 +451,12 @@ namespace Microsoft.AspNet.OData.Extensions
             return false;
         }
 
-        internal static ODataUrlKeyDelimiter GetUrlKeyDelimiter(this HttpConfiguration configuration)
+        /// <summary>
+        /// Gets the UrlKeyDelimiter for the specified configuration
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static ODataUrlKeyDelimiter GetUrlKeyDelimiter(this HttpConfiguration configuration)
         {
             if (configuration == null)
             {
@@ -748,7 +753,7 @@ namespace Microsoft.AspNet.OData.Extensions
         /// <param name="routeName">The route name.</param>
         /// <param name="configureAction">The configuring action to add the services to the root container.</param>
         /// <returns>The per-route container from the configuration</returns>
-        internal static IServiceProvider CreateODataRootContainer(this HttpConfiguration configuration,
+        public static IServiceProvider CreateODataRootContainer(this HttpConfiguration configuration,
             string routeName, Action<IContainerBuilder> configureAction)
         {
             IPerRouteContainer perRouteContainer = configuration.GetPerRouteContainer();

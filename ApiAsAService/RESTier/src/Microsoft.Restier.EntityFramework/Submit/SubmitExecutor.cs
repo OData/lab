@@ -17,7 +17,7 @@ namespace Microsoft.Restier.EntityFramework
     /// <summary>
     /// To execute submission of changes to database.
     /// </summary>
-    internal class SubmitExecutor : ISubmitExecutor
+    public class SubmitExecutor : ISubmitExecutor
     {
         /// <summary>
         /// Asynchronously executes the submission.
@@ -29,7 +29,9 @@ namespace Microsoft.Restier.EntityFramework
         {
             var dbContext = context.GetApiService<DbContext>();
             await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1062 // Validate arguments of public methods
             return new SubmitResult(context.ChangeSet);
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
     }
 }

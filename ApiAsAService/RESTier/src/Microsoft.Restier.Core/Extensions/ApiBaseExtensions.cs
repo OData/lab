@@ -467,6 +467,7 @@ namespace Microsoft.Restier.Core
             Type elementType = null;
 
             var mapper = api.GetApiService<IModelMapper>();
+            
             if (mapper != null)
             {
                 var modelContext = new ModelContext(api.ServiceProvider);

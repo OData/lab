@@ -12,9 +12,11 @@ namespace Microsoft.Restier.EntityFramework
     /// <summary>
     /// A query expression filter to handle EF related logic.
     /// </summary>
-    internal class QueryExpressionProcessor : IQueryExpressionProcessor
+    public class QueryExpressionProcessor : IQueryExpressionProcessor
     {
-        // It will be ConventionBasedEntitySetProcessor
+        /// <summary>
+        /// Inner QueryExpressionProcessor It will be ConventionBasedEntitySetProcessor
+        /// </summary>
         public IQueryExpressionProcessor Inner { get; set; }
 
         /// <inheritdoc/>
@@ -25,7 +27,9 @@ namespace Microsoft.Restier.EntityFramework
             if (Inner != null)
             {
                 var innerFilteredExpression = Inner.Process(context);
+#pragma warning disable CA1062 // Validate arguments of public methods
                 if (innerFilteredExpression != null && innerFilteredExpression != context.VisitedNode)
+#pragma warning restore CA1062 // Validate arguments of public methods
                 {
                     return innerFilteredExpression;
                 }

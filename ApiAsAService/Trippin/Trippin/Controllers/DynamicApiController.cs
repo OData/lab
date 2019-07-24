@@ -18,6 +18,7 @@ using Microsoft.OData.Service.ApiAsAService.Api;
 using Microsoft.OData.Service.ApiAsAService.Models;
 using Microsoft.Restier.AspNet;
 using Microsoft.Restier.Core;
+using Microsoft.Restier.Core.Model;
 
 namespace Microsoft.OData.Service.ApiAsAService.Controllers
 {
@@ -25,15 +26,27 @@ namespace Microsoft.OData.Service.ApiAsAService.Controllers
     {
         public async Task<HttpResponseMessage> Get(CancellationToken cancellationToken)
         {
-            // Get the data source from the request
-            ODataPath path = Request.ODataProperties().Path;
-            string dataSource = path.Segments[0].Identifier;
-            
-            //IEdmCollectionType collectionType = (IEdmCollectionType)path.EdmType;
-            //IEdmEntityTypeReference entityType = collectionType.ElementType.AsEntity();
 
-            Type dynamicType = dataSource=="Trippin" ? typeof(Models.TrippinModel) : typeof(Models.TrippinModel);
-            base.SetApi(DynamicHelper.CreateDynamicApi(dynamicType, Request.GetRequestContainer()));
+            IServiceProvider serviceProvider = Request.GetRequestContainer();
+            //DynamicModelBuilder modelBuilder = serviceProvider.GetRequiredService<IModelBuilder>() as DynamicModelBuilder;
+            //string datasource = modelBuilder.DataSourceName;
+
+            //Type dynamicType;
+            //switch (datasource)
+            //{
+            //    case "Trippin":
+            //        dynamicType = typeof(Models.TrippinModel);
+            //        break;
+            //    case "NWind":
+            //        dynamicType = typeof(ODataDemo.NWModel);
+            //        break;
+            //    default:
+            //        return Request.CreateErrorResponse(HttpStatusCode.NotFound, String.Format("Service {0} not found.", datasource));
+            //}
+
+            ApiFactory factory = Request.GetRequestContainer().GetRequiredService<ApiFactory>();
+//            factory.ModelType = dynamicType;
+            base.SetApi(factory.GetApiBase());
 
             return await base.GetResponse(cancellationToken);
         }

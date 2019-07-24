@@ -26,8 +26,11 @@ namespace Microsoft.Restier.EntityFramework
     /// Represents a model producer that uses the
     /// metadata workspace accessible from a DbContext.
     /// </summary>
-    internal class ModelProducer : IModelBuilder
+    public class ModelProducer : IModelBuilder
     {
+        /// <summary>
+        /// InnerModelBuilder
+        /// </summary>
         public IModelBuilder InnerModelBuilder { get; set; }
 
         /// <summary>
@@ -106,7 +109,9 @@ namespace Microsoft.Restier.EntityFramework
                 var clrType = itemCollection.GetClrType(objectSpaceType);
 
                 // As entity set name and type map
+#pragma warning disable CA1062 // Validate arguments of public methods
                 context.ResourceSetTypeMap.Add(efEntitySet.Name, clrType);
+#pragma warning restore CA1062 // Validate arguments of public methods
 
                 ICollection<PropertyInfo> keyProperties = new List<PropertyInfo>();
                 foreach (var property in efEntityType.KeyProperties)

@@ -43,6 +43,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="App_Data\NWind.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="App_Data\Trippin.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -75,6 +78,7 @@
     <Compile Include="Models\CustomizedPayloadValueConverter.cs" />
     <Compile Include="Models\SpecialOrder.cs" />
     <Compile Include="Models\Trip.cs" />
+    <Compile Include="Models\NWModel.cs" />
     <Compile Include="Models\TrippinModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Submit\CustomizedSubmitProcessor.cs" />
@@ -198,7 +202,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>51480</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:18384/</IISUrl>
+          <IISUrl>http://localhost:18384</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
