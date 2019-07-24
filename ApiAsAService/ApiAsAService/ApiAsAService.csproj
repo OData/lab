@@ -113,6 +113,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DataSource\AnotherDataSource.cs" />
     <Compile Include="DataSource\DataSourceProvider.cs" />
+    <Compile Include="DataSource\DocumentDBRepository.cs" />
     <Compile Include="DataSource\IDataSource.cs" />
     <Compile Include="DataSource\MyDataSource.cs" />
     <Compile Include="Controllers\HandleAllController.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="DynamicModelHelper.cs" />
     <Compile Include="HttpRequestMessageProvider.cs" />
     <Compile Include="IHttpRequestMessageProvider.cs" />
+    <Compile Include="Item.cs" />
     <Compile Include="MatchAllRoutingConvention.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

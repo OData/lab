@@ -6,7 +6,7 @@
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup>
-    <PackageVersion>1.0.0-Beta2.Preview1</PackageVersion>
+    <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
 
   <!--
