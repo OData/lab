@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ReflectionTester
+﻿namespace EdmObjectsGenerator
 {
+    using System;
+    using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
     using System.Text.RegularExpressions;
@@ -287,7 +284,8 @@ namespace ReflectionTester
 
         static void Main(string[] args)
         {
-            var model = ReadModel(@"C:\repos\fun\lab\ApiAsAService\EdmHelperTest\NW_Simple.xml");
+            //TODO: grab edm path and assembly name from cmdline args
+            var model = ReadModel(@"<<insert path to edm here>>");
             var name = "NW_Simple";
 
             // create a dynamic assembly and module 
