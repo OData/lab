@@ -36,6 +36,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Microsoft.AspNet.OData.Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.OData.Service.ApiAsAService", "Trippin\Trippin\Microsoft.OData.Service.ApiAsAService.csproj", "{B379640E-9064-438D-8DA5-6F7B394C2C46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdmObjectsGenerator", "EdmObjectsGenerator\EdmObjectsGenerator.csproj", "{3678C588-F1DD-4EF6-879A-3D1D8114A880}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		WebAPI\src\Microsoft.AspNet.OData.Shared\Microsoft.AspNet.OData.Shared.projitems*{a6f9775d-f7e2-424e-8363-79644a73038f}*SharedItemsImports = 4
@@ -83,6 +85,12 @@ Global
 		{B379640E-9064-438D-8DA5-6F7B394C2C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B379640E-9064-438D-8DA5-6F7B394C2C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B379640E-9064-438D-8DA5-6F7B394C2C46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3678C588-F1DD-4EF6-879A-3D1D8114A880}.CodeAnalysis|Any CPU.ActiveCfg = Release|Any CPU
+		{3678C588-F1DD-4EF6-879A-3D1D8114A880}.CodeAnalysis|Any CPU.Build.0 = Release|Any CPU
+		{3678C588-F1DD-4EF6-879A-3D1D8114A880}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3678C588-F1DD-4EF6-879A-3D1D8114A880}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3678C588-F1DD-4EF6-879A-3D1D8114A880}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3678C588-F1DD-4EF6-879A-3D1D8114A880}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

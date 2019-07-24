@@ -15,7 +15,7 @@
     using Microsoft.OData.Edm.Csdl;
     using Microsoft.OData.Edm.Validation;
 
-    class Program
+    public class Program
     {
         static Dictionary<string, TypeBuilderInfo> _typeBuildersDict = new Dictionary<string, TypeBuilderInfo>();
         static Regex collectionRegex = new Regex(@"Collection\((.+)\)", RegexOptions.Compiled);
@@ -282,10 +282,27 @@
             }
         }
 
-        static void Main(string[] args)
+        public static Type GenerateDbContext(string csdlFile)
+        {
+            var model = ReadModel(csdlFile);
+            var name = csdlFile.Split('\\').Last();
+
+            // create a dynamic assembly and module 
+            AssemblyName assemblyName = new AssemblyName();
+            assemblyName.Name = name;
+            AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            ModuleBuilder module;
+            module = assemblyBuilder.DefineDynamicModule($"{assemblyName.Name}.dll");
+            BuildModules(model, module);
+            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == name);
+            Type entitiesType = assembly.GetTypes().FirstOrDefault(t => t.Name == "Entities");
+            return entitiesType;
+        }
+
+        public static void Main(string[] args)
         {
             //TODO: grab edm path and assembly name from cmdline args
-            var model = ReadModel(@"<<insert path to edm here>>");
+            var model = ReadModel(@"C:\Repos\ApiAsAService\ApiAsAService\Trippin\Trippin\App_Data\NWind.xml");
             var name = "NW_Simple";
 
             // create a dynamic assembly and module 

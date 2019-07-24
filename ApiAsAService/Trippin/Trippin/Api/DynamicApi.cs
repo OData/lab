@@ -72,5 +72,6 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
         {
             return GetModel();
         }
+
     }
 }
