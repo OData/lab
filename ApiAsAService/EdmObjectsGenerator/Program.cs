@@ -19,12 +19,12 @@
     {
         static Dictionary<string, TypeBuilderInfo> _typeBuildersDict = new Dictionary<string, TypeBuilderInfo>();
         static Regex collectionRegex = new Regex(@"Collection\((.+)\)", RegexOptions.Compiled);
-
+        static Queue<TypeBuilderInfo> _builderQueue = new Queue<TypeBuilderInfo>();
         public class TypeBuilderInfo
         {
             public bool IsDerived { get; set; }
             public bool IsStructured { get; set; }
-            public TypeBuilder Builder { get; set; }
+            public TypeInfo Builder { get; set; }
         }
 
         public static IEdmModel ReadModel(string fileName)
@@ -49,48 +49,48 @@
 
         public static void BuildModules(IEdmModel model, ModuleBuilder moduleBuilder)
         {
-
-            IList<string> baseProps = new List<string>();
+            //first create the basic types for the enums
             foreach (var modelSchemaElement in model.SchemaElements)
             {
                 var declaredType = model.FindDeclaredType(modelSchemaElement.FullName());
-
-                if (declaredType is IEdmStructuredType)
+                if (declaredType == null) continue;
+                if (declaredType is IEdmEnumType)
                 {
-                    if (declaredType is IEdmEntityType)
-                    {
+                    CreateType((IEdmEnumType)declaredType, moduleBuilder, declaredType.FullName());
+                }
+                
+            }
+            //next create the basic types for the types
+            foreach (var modelSchemaElement in model.SchemaElements)
+            {
 
-                        var derivedTypes = model.FindDirectlyDerivedTypes((IEdmStructuredType)declaredType);
-                        if (derivedTypes.Any())
-                        {
-                            baseProps.Add(declaredType.FullName());
-                            Compile((IEdmStructuredType)declaredType, moduleBuilder, declaredType.FullName());
-                        }
-                    }
-                    else
-                    {
-                        baseProps.Add(declaredType.FullName());
-                        Compile((IEdmStructuredType)declaredType, moduleBuilder, declaredType.FullName());
-                        _typeBuildersDict[declaredType.FullName()].IsStructured = true;
-                    }
-
+                var declaredType = model.FindDeclaredType(modelSchemaElement.FullName());
+                if (declaredType == null) continue;
+                if (!(declaredType is IEdmEnumType))
+                {
+                    CreateType((IEdmStructuredType)declaredType, moduleBuilder, declaredType.FullName());
                 }
             }
 
+            //go through and add all elements and their properties but not nav properties
             foreach (var modelSchemaElement in model.SchemaElements)
             {
-                if (!baseProps.Contains(modelSchemaElement.FullName()))
+
+                var one = model.FindDeclaredType(modelSchemaElement.FullName());
+                if (one != null && !(modelSchemaElement is IEdmEnumType))
                 {
-                    var one = model.FindDeclaredType(modelSchemaElement.FullName());
-                    if (one != null)
-                    {
-                        Compile((IEdmStructuredType)one, moduleBuilder, one.FullName());
-                    }
+                    Compile((IEdmStructuredType)one, moduleBuilder, one.FullName());
                 }
+
             }
 
+            //finally add the nav properties
             foreach (var modelSchemaElement in model.SchemaElements)
             {
+                if ((modelSchemaElement is IEdmEnumType))
+                {
+                    continue;
+                }
                 var one = model.FindDeclaredType(modelSchemaElement.FullName());
                 if (one != null)
                 {
@@ -98,17 +98,22 @@
                 }
 
             }
-
-            foreach (var typeBuilder in _typeBuildersDict)
+            //now go through the queue and create the types in dependency order
+            while (_builderQueue.Count != 0)
             {
-                if (typeBuilder.Value.IsDerived)
+                var typeBuilder = _builderQueue.Dequeue();
+                if (typeBuilder.Builder is TypeBuilder)
                 {
+                    ((TypeBuilder)typeBuilder.Builder).CreateType();
 
-                    var previouslyBuiltType = _typeBuildersDict[(typeBuilder.Value.Builder.BaseType.FullName)];
-                    typeBuilder.Value.Builder.CreatePassThroughConstructors(previouslyBuiltType.Builder);
                 }
-                typeBuilder.Value.Builder.CreateType();
+                if (typeBuilder.Builder is EnumBuilder)
+                {
+                    ((EnumBuilder)typeBuilder.Builder).CreateType();
+
+                }
             }
+            
 
             //generate the entities type
             var entitiesBuilder = moduleBuilder.DefineType("Entities", TypeAttributes.Class | TypeAttributes.Public, typeof(DbContext));
@@ -122,10 +127,11 @@
                 {
                     Type listOf = typeof(DbSet<>);
                     Type selfContained = listOf.MakeGenericType(typeBuilderInfo.Value.Builder);
-                    PropertyBuilderHelper.BuildProperty(entitiesBuilder, typeBuilderInfo.Key.Split('.')[1], selfContained);
+                    PropertyBuilderHelper.BuildProperty(entitiesBuilder, typeBuilderInfo.Value.Builder.Name, selfContained);
                 }
-               
             }
+
+           
             // create the Main(string[] args) method
             MethodBuilder methodbuilder = entitiesBuilder.DefineMethod("OnModelCreating", MethodAttributes.Public
                                                                                           | MethodAttributes.HideBySig
@@ -142,6 +148,40 @@
 
         }
 
+        internal static TypeBuilder CreateType(IEdmStructuredType targetType, ModuleBuilder moduleBuilder, string moduleName)
+        {
+            if (_typeBuildersDict.ContainsKey(moduleName))
+            {
+                return (TypeBuilder)_typeBuildersDict[moduleName].Builder;
+            }
+            if (targetType.BaseType != null)
+            {
+                TypeBuilder previouslyBuiltType = null;
+                if (!_typeBuildersDict.ContainsKey(moduleName))
+                {
+                    previouslyBuiltType = CreateType(targetType.BaseType, moduleBuilder, targetType.BaseType.FullTypeName());
+
+                }
+
+                var typeBuilder = moduleBuilder.DefineType(moduleName, TypeAttributes.Class | TypeAttributes.Public, previouslyBuiltType);
+                var typeBuilderInfo = new TypeBuilderInfo() {Builder = typeBuilder, IsDerived = true};
+                _typeBuildersDict.Add(moduleName, typeBuilderInfo);
+                _builderQueue.Enqueue(typeBuilderInfo);
+                return typeBuilder;
+
+            }
+            else
+            {
+                var typeBuilder = moduleBuilder.DefineType(moduleName, TypeAttributes.Class | TypeAttributes.Public);
+                var builderInfo = new TypeBuilderInfo() {Builder = typeBuilder, IsDerived = false};
+                _typeBuildersDict.Add(moduleName, builderInfo);
+                _builderQueue.Enqueue(builderInfo);
+
+                return typeBuilder;
+            }
+
+        }
+
 
 
         internal static void Compile(IEdmStructuredType type, ModuleBuilder moduleBuilder, string moduleName, bool navPass = false)
@@ -149,11 +189,7 @@
             TypeBuilder typeBuilder = null;
             if (type.BaseType != null && !navPass)
             {
-                var previouslyBuiltType = _typeBuildersDict[(type.BaseType.FullTypeName())];
-
-                typeBuilder = moduleBuilder.DefineType(moduleName, TypeAttributes.Class | TypeAttributes.Public, previouslyBuiltType.Builder);
-                _typeBuildersDict.Add(moduleName, new TypeBuilderInfo() { Builder = typeBuilder, IsDerived = true });
-
+                typeBuilder = CreateType(type, moduleBuilder, moduleName);
 
             }
 
@@ -161,8 +197,7 @@
             {
                 if (typeBuilder == null)
                 {
-                    typeBuilder = moduleBuilder.DefineType(moduleName, TypeAttributes.Class | TypeAttributes.Public);
-                    _typeBuildersDict.Add(moduleName, new TypeBuilderInfo() { Builder = typeBuilder, IsDerived = false });
+                    typeBuilder = CreateType(type, moduleBuilder, moduleName);
                 }
 
                 foreach (var property in type.DeclaredProperties)
@@ -177,7 +212,7 @@
             }
             else
             {
-                typeBuilder = _typeBuildersDict[moduleName].Builder;
+                typeBuilder = (TypeBuilder)_typeBuildersDict[moduleName].Builder;
                 foreach (var property in type.DeclaredProperties)
                 {
                     if (property.PropertyKind == EdmPropertyKind.Navigation)
@@ -185,6 +220,32 @@
                 }
             }
 
+        }
+
+        internal static EnumBuilder CreateType(IEdmEnumType targetType, ModuleBuilder moduleBuilder, string moduleName)
+        {
+            if (_typeBuildersDict.ContainsKey(moduleName))
+            {
+                return (EnumBuilder)_typeBuildersDict[moduleName].Builder;
+            }
+
+            EnumBuilder typeBuilder = moduleBuilder.DefineEnum(moduleName, TypeAttributes.Public, typeof(int));
+            var builderInfo = new TypeBuilderInfo() {Builder = typeBuilder, IsDerived = false};
+            _typeBuildersDict.Add(moduleName, builderInfo);
+            _builderQueue.Enqueue(builderInfo);
+            return typeBuilder;
+
+
+        }
+
+        internal static void Compile(IEdmEnumType type, ModuleBuilder moduleBuilder, string moduleName)
+        {
+            var typeBuilder = CreateType(type, moduleBuilder, moduleName);
+            foreach (var enumMember in type.Members)
+            {
+                GenerateEnum(enumMember, typeBuilder, moduleBuilder);
+
+            }
         }
 
         internal static void GenerateProperty(IEdmProperty property, TypeBuilder typeBuilder, ModuleBuilder moduleBuilder)
@@ -206,7 +267,9 @@
                     {
                         var typeName = collectionRegex.Match(property.Type.FullName()).Groups[1].Value;
                         Type listOf = typeof(List<>);
-                        Type selfContained = listOf.MakeGenericType(_typeBuildersDict[typeName].Builder);
+                        var baseType = _typeBuildersDict.ContainsKey(typeName) ? _typeBuildersDict[typeName].Builder : typeof(string);
+
+                        var selfContained = listOf.MakeGenericType(baseType);
                         propertyType = selfContained;
                     }
                     else
@@ -215,22 +278,44 @@
                         propertyType = navProptype.Builder;
                     }
 
-
                 }
                 else
                 {
-                   
-                    var previouslyBuiltType = moduleBuilder.GetType(property.Type.FullName());
-                    propertyType = previouslyBuiltType;
+                    if (property.Type.FullName().StartsWith("Collection"))
+                    {
+                        var typeName = collectionRegex.Match(property.Type.FullName()).Groups[1].Value;
+                        Type listOf = typeof(List<>);
+                        var baseType = _typeBuildersDict.ContainsKey(typeName) ? _typeBuildersDict[typeName].Builder : typeof(string);
+                        var selfContained = listOf.MakeGenericType(baseType);
+
+
+
+                        propertyType = selfContained;
+                    }
+                    else
+                    {
+                        var previouslyBuiltType = _typeBuildersDict[property.Type.FullName()];
+
+                        propertyType = previouslyBuiltType.Builder;
+                    }
+
                 }
             }
-            if (property.Type.IsNullable && Nullable.GetUnderlyingType(propertyType)!=null)
+            if (property.Type.IsNullable && Nullable.GetUnderlyingType(propertyType) != null)
             {
                 Type nullableOf = typeof(Nullable<>);
                 Type selfContained = nullableOf.MakeGenericType(propertyType);
                 propertyType = selfContained;
             }
             PropertyBuilderHelper.BuildProperty(typeBuilder, propertyName, propertyType);
+        }
+
+        internal static void GenerateEnum(IEdmEnumMember member, EnumBuilder enumBuilder, ModuleBuilder moduleBuilder)
+        {
+            var memberName = member.Name;
+
+            var memberValue = Convert.ToInt32(member.Value.Value);
+            enumBuilder.DefineLiteral(memberName, memberValue);
         }
 
         /// <summary>
@@ -299,11 +384,11 @@
             return entitiesType;
         }
 
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
             //TODO: grab edm path and assembly name from cmdline args
-            var model = ReadModel(@"C:\Repos\ApiAsAService\ApiAsAService\Trippin\Trippin\App_Data\NWind.xml");
-            var name = "NW_Simple";
+            var model = ReadModel("<<insert path here>>");
+            var name = "name";
 
             // create a dynamic assembly and module 
             AssemblyName assemblyName = new AssemblyName();
