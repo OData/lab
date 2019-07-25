@@ -54,8 +54,6 @@ namespace Microsoft.OData.Service.ApiAsAService
                         
                         IServiceProvider serviceProvider = request.CreateRequestContainer(this.RouteName);
 
-                        //IHttpRequestMessageProvider httpRequestMessageProvider = requestContainer.GetRequiredService<IHttpRequestMessageProvider>();
-                        //httpRequestMessageProvider.Request = request;
                         //Type dynamicType;
                         //switch (dataSourceName)
                         //{
@@ -68,10 +66,11 @@ namespace Microsoft.OData.Service.ApiAsAService
                         //    default:
                         //        throw new Exception("Service not found"); //return request.CreateErrorResponse(HttpStatusCode.NotFound, String.Format("Service {0} not found.", dataSourceName));
                         //}
+
                         var appData = System.Web.HttpContext.Current.Server.MapPath("~/App_Data");
                         var file = System.IO.Path.Combine(appData, dataSourceName + ".xml");
 
-                        Type dynamicType = EdmObjectsGenerator.Program.GenerateDbContext(file);
+                        Type dynamicType = DynamicHelper.GetDynamicDbContext(file);
 
                         ApiFactory factory = serviceProvider.GetRequiredService<ApiFactory>();
                         factory.ModelType = dynamicType;

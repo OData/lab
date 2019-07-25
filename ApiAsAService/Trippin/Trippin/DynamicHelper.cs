@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.OData.Batch;
+﻿using EdmObjectsGenerator;
+using Microsoft.AspNet.OData.Batch;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNet.OData.Routing.Conventions;
@@ -25,9 +26,9 @@ namespace Microsoft.OData.Service.ApiAsAService
     public static class DynamicHelper
     {
         private const string MapRestierRouteMethod = "MapRestierRoute";
-//        private const string RestierAssembly = "Microsoft.Restier.AspNet";
+        //        private const string RestierAssembly = "Microsoft.Restier.AspNet";
         private const string httpConfigurationExtensionsType = "System.Web.Http.HttpConfigurationExtensions";
-//        private const string ApiAsAServiceAssembly = "Microsoft.OData.Service.ApiAsAService";
+        //        private const string ApiAsAServiceAssembly = "Microsoft.OData.Service.ApiAsAService";
         private const string DynamicApiType = "Microsoft.OData.Service.ApiAsAService.Api.DynamicApi`1";
         private const string DynamicHelperType = "Microsoft.OData.Service.ApiAsAService.DynamicHelper";
         private static Type dynamicApiType = Assembly.GetExecutingAssembly().GetType(DynamicApiType);
@@ -90,7 +91,7 @@ namespace Microsoft.OData.Service.ApiAsAService
             // Callback is called by ApiBase.AddApiServices method to add real services.
             ApiBase.AddPublisherServices(typeof(TApi), services =>
             {
-                services.AddScoped<ApiFactory>(sp=>new ApiFactory(sp));
+                services.AddScoped<ApiFactory>(sp => new ApiFactory(sp));
                 MapEfServices(services);
                 services.AddODataServices<TApi>();
             });
@@ -245,8 +246,24 @@ namespace Microsoft.OData.Service.ApiAsAService
                 .AddService<IChangeSetInitializer, ChangeSetInitializer>()
                 .AddService<ISubmitExecutor, SubmitExecutor>()
                 ;
+        }
 
+        public static Type GetDynamicDbContext(string csdlFile)
+        {
+            string name = csdlFile.Split('\\').Last().Replace(".xml", "");
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            var newDomain = AppDomain.CreateDomain(name, null, AppDomain.CurrentDomain.SetupInformation);
+            newDomain.SetData("domain", currentDomain);
+            var program = new DbContextGenerator();
+            program.csdlFileName = csdlFile;
+            newDomain.DoCallBack(new CrossAppDomainDelegate(program.GenerateDbContext));
+            // string assemblies = String.Concat(newDomain.GetAssemblies().Select(a=>a.GetName().Name));
+            // Assembly assembly = newDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == assemblyName.Name);
+            //Type result = program.DbContextType;
+            //return Result.DbContextType;
+            //return program.DbContextType;
+            object resultType = AppDomain.CurrentDomain.GetData("contextType");
+            return resultType as Type;
         }
     }
-
 }

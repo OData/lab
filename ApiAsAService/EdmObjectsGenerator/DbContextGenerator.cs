@@ -15,12 +15,13 @@
     using Microsoft.OData.Edm.Csdl;
     using Microsoft.OData.Edm.Validation;
 
-    public class Program
+    [Serializable]
+    public class DbContextGenerator
     {
         static Dictionary<string, TypeBuilderInfo> _typeBuildersDict = new Dictionary<string, TypeBuilderInfo>();
         static Regex collectionRegex = new Regex(@"Collection\((.+)\)", RegexOptions.Compiled);
 
-        public class TypeBuilderInfo
+        public class TypeBuilderInfo : MarshalByRefObject
         {
             public bool IsDerived { get; set; }
             public bool IsStructured { get; set; }
@@ -282,38 +283,45 @@
             }
         }
 
-        public static Type GenerateDbContext(string csdlFile)
+        public string csdlFileName { get; set; }
+
+        public Type DbContextType { get; set; }
+
+        public void GenerateDbContext()
         {
-            var model = ReadModel(csdlFile);
-            var name = csdlFile.Split('\\').Last();
+            string fileName = this.csdlFileName;
+            IEdmModel model = ReadModel(fileName);
 
-            // create a dynamic assembly and module 
+            AppDomain appDomain = AppDomain.CurrentDomain;
+            string name = fileName.Split('\\').Last().Replace(".xml", "");
             AssemblyName assemblyName = new AssemblyName();
-            assemblyName.Name = name;
-            AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-            ModuleBuilder module;
-            module = assemblyBuilder.DefineDynamicModule($"{assemblyName.Name}.dll");
-            BuildModules(model, module);
-            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == name);
-            Type entitiesType = assembly.GetTypes().FirstOrDefault(t => t.Name == "Entities");
-            return entitiesType;
-        }
+            assemblyName.Name = name + "_Assembly";
 
-        public static void Main(string[] args)
-        {
-            //TODO: grab edm path and assembly name from cmdline args
-            var model = ReadModel(@"C:\Repos\ApiAsAService\ApiAsAService\Trippin\Trippin\App_Data\NWind.xml");
-            var name = "NW_Simple";
-
-            // create a dynamic assembly and module 
-            AssemblyName assemblyName = new AssemblyName();
-            assemblyName.Name = name;
-            AssemblyBuilder assemblyBuilder = Thread.GetDomain().DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
-            ModuleBuilder module;
-            module = assemblyBuilder.DefineDynamicModule($"{assemblyName.Name}.dll");
+            AssemblyBuilder assemblyBuilder = appDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
+            ModuleBuilder module = assemblyBuilder.DefineDynamicModule($"{assemblyName.Name}");
             BuildModules(model, module);
 
-            assemblyBuilder.Save($"{assemblyName.Name}.dll");
+            //assemblyBuilder.Save($"{assemblyName.Name}.dll");
+            Assembly assembly = appDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == assemblyName.Name);
+            this.DbContextType = assembly.GetTypes().FirstOrDefault(t => t.Name == "Entities");
+            AppDomain domain = appDomain.GetData("domain") as AppDomain;
+            domain.SetData("contextType", this.DbContextType);
+            //AppDomain.CurrentDomain.SetData("contextType", this.DbContextType);
+            DbContextGenerator program = new DbContextGenerator();
+            //Result.DbContextType = this.DbContextType;
+            //domain.DoCallBack(new CrossAppDomainDelegate(program.ReturnDbContext));
         }
+
+        //public void ReturnDbContext()
+        //{
+        //    Type response = this.DbContextType;
+        //    Result.DbContextType = response;
+        //}
     }
+
+    //[Serializable]
+    //public static class Result
+    //{
+    //    public static Type DbContextType { get; set; }
+    //}
 }
