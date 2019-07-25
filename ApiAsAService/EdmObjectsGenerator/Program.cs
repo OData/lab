@@ -70,6 +70,11 @@
                 {
                     CreateType((IEdmStructuredType)declaredType, moduleBuilder, declaredType.FullName());
                 }
+                else
+                {
+                    Compile((IEdmEnumType)declaredType, moduleBuilder, declaredType.FullName());
+
+                }
             }
 
             //go through and add all elements and their properties but not nav properties
@@ -387,8 +392,8 @@
         static void Main(string[] args)
         {
             //TODO: grab edm path and assembly name from cmdline args
-            var model = ReadModel("<<insert path here>>");
-            var name = "name";
+            var model = ReadModel(@"C:\repos\fun\lab\ApiAsAService\Trippin.xml");
+            var name = "Trippin2";
 
             // create a dynamic assembly and module 
             AssemblyName assemblyName = new AssemblyName();
