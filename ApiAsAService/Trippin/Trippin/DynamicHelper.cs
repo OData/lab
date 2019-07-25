@@ -251,12 +251,29 @@ namespace Microsoft.OData.Service.ApiAsAService
         public static Type GetDynamicDbContext(string csdlFile)
         {
             string name = csdlFile.Split('\\').Last().Replace(".xml", "");
+            DbContextGenerator generator = new DbContextGenerator();
+            return generator.GenerateDbContext(csdlFile);
+        }
+
+        public static Type GetDynamicDbContextInADifferentAppDomain(string csdlFile)
+        {
+            string name = csdlFile.Split('\\').Last().Replace(".xml", "");
+
+            // Create a new AppDomain and execute the generation in that AppDomain
             AppDomain currentDomain = AppDomain.CurrentDomain;
             var newDomain = AppDomain.CreateDomain(name, null, AppDomain.CurrentDomain.SetupInformation);
+
+            // Pass this app domain to the new one
             newDomain.SetData("domain", currentDomain);
             var program = new DbContextGenerator();
+
+            // Set the name of the csdl file. Could also be done with newDomain.SetData()
             program.csdlFileName = csdlFile;
-            newDomain.DoCallBack(new CrossAppDomainDelegate(program.GenerateDbContext));
+
+            // Create the Assembly in the new AppDomain
+            newDomain.DoCallBack(new CrossAppDomainDelegate(program.GenerateDbContextInANewAppDomain));
+ 
+            // Various attempts passing the type back to this app domain; none work
             // string assemblies = String.Concat(newDomain.GetAssemblies().Select(a=>a.GetName().Name));
             // Assembly assembly = newDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == assemblyName.Name);
             //Type result = program.DbContextType;
