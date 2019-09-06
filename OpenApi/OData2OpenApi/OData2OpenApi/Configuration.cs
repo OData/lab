@@ -72,7 +72,14 @@ namespace Microsoft.OData2OpenApi.ConsoleApp
         /// </summary>
         [CommandOption("--PrefixTypeBeforeKey=[true/false] : Enable prefix entity type name before single key.")]
         public bool PrefixTypeBeforeKey { get; set; } = true;
-#endregion
+
+        /// <summary>
+        /// Gets/set the target OpenAPI version.
+        /// </summary>
+        [CommandOption("--TargetOpenAPIVersion=[value] : Select the target API version")]
+        public string TargetOpenAPIVersion { get; set; }
+
+        #endregion
 
         /// <summary>
         /// Gets the boolean value indicating whether the input is local file or not.
@@ -80,9 +87,15 @@ namespace Microsoft.OData2OpenApi.ConsoleApp
         public bool IsLocalFile { get; private set; }
 
         /// <summary>
+        /// Gets the spec version to convert to format.
+        /// </summary>
+        public OpenApiSpecVersion SpecVersion { get; private set; } = OpenApiSpecVersion.OpenApi3_0;
+
+        /// <summary>
         /// Gets the output format.
         /// </summary>
         public OpenApiFormat Format { get; private set; } = OpenApiFormat.Json;
+
 
         /// <summary>
         /// Validate the configuration.
@@ -102,6 +115,11 @@ namespace Microsoft.OData2OpenApi.ConsoleApp
                 {
                     throw new Exception($"File '{ InputCsdl }' is not existed.\n");
                 }
+            }
+
+            if (TargetOpenAPIVersion == "2")
+            {
+                SpecVersion = OpenApiSpecVersion.OpenApi2_0;
             }
 
             if (String.IsNullOrWhiteSpace(OutputFileName))

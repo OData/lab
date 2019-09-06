@@ -29,7 +29,7 @@ namespace Microsoft.OData2OpenApi.ConsoleApp
             using (FileStream fs = File.Create(config.OutputFileName))
             {
                 OpenApiDocument document = edmModel.ConvertToOpenApi(settings);
-                document.Serialize(fs, OpenApi.OpenApiSpecVersion.OpenApi3_0, config.Format);
+                document.Serialize(fs, config.SpecVersion, config.Format);
                 fs.Flush();
             }
 
