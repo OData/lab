@@ -76,7 +76,7 @@ namespace Microsoft.OData2OpenApi.ConsoleApp
         /// <summary>
         /// Gets/set the target OpenAPI version.
         /// </summary>
-        [CommandOption("--TargetOpenAPIVersion=[value] : Select the target API version")]
+        [CommandOption("--TargetOpenAPIVersion=[value] : Select the target API version (2 or 3)")]
         public string TargetOpenAPIVersion { get; set; }
 
         #endregion
