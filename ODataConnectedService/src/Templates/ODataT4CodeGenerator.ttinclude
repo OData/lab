@@ -47,7 +47,8 @@ THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             UseDataServiceCollection = this.UseDataServiceCollection,
             TargetLanguage = this.TargetLanguage,
             EnableNamingAlias = this.EnableNamingAlias,
-            IgnoreUnexpectedElementsAndAttributes = this.IgnoreUnexpectedElementsAndAttributes
+            IgnoreUnexpectedElementsAndAttributes = this.IgnoreUnexpectedElementsAndAttributes,
+			MakeClassesInternal = true
         };
     }
     else
@@ -63,7 +64,8 @@ THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             UseDataServiceCollection = this.UseDataServiceCollection,
             TargetLanguage = this.TargetLanguage,
             EnableNamingAlias = this.EnableNamingAlias,
-            IgnoreUnexpectedElementsAndAttributes = this.IgnoreUnexpectedElementsAndAttributes
+            IgnoreUnexpectedElementsAndAttributes = this.IgnoreUnexpectedElementsAndAttributes,
+			MakeClassesInternal = true
         };
     }
 
@@ -672,6 +674,16 @@ public class CodeGenerationContext
         get;
         set;
     }
+	
+	/// <summary>
+	/// true to use internal access modifier for generated classes, otherwise they will be made public.
+	/// This is useful if you don't want the generated classes to be visible outside the assembly
+	/// </summary>
+	public bool MakeClassesInternal
+	{
+		get;
+		set;
+	}
 
     /// <summary>
     /// Specifies which specific .Net Framework language the generated code will target.
@@ -932,6 +944,8 @@ public abstract class ODataClientTemplate : TemplateBase
     internal abstract string GlobalPrefix { get; }
     internal abstract string SystemTypeTypeName { get; }
     internal abstract string AbstractModifier { get; }
+	internal abstract string PublicAccessModifier { get; }
+	internal abstract string InternalAccessModifier { get; }
     internal abstract string DataServiceActionQueryTypeName { get; }
     internal abstract string DataServiceActionQuerySingleOfTStructureTemplate { get; }
     internal abstract string DataServiceActionQueryOfTStructureTemplate { get; }
@@ -1076,6 +1090,12 @@ public abstract class ODataClientTemplate : TemplateBase
         return clrReferenceTypes;
     } }
     private HashSet<EdmPrimitiveTypeKind> clrReferenceTypes;
+
+	internal string ClassAccessModifier {
+		get {
+			return this.context.MakeClassesInternal ? this.InternalAccessModifier : this.PublicAccessModifier;
+		}
+	}
 
     /// <summary>
     /// Generates code for the OData client.
@@ -3016,6 +3036,8 @@ public sealed class ODataClientCSharpTemplate : ODataClientTemplate
     internal override string GlobalPrefix { get {return "global::"; } }
     internal override string SystemTypeTypeName { get { return "global::System.Type"; } }
     internal override string AbstractModifier { get { return " abstract"; } }
+	internal override string PublicAccessModifier { get { return "public"; } }
+	internal override string InternalAccessModifier { get { return "internal"; } }
     internal override string DataServiceActionQueryTypeName { get { return "global::Microsoft.OData.Client.DataServiceActionQuery"; } }
     internal override string DataServiceActionQuerySingleOfTStructureTemplate { get { return "global::Microsoft.OData.Client.DataServiceActionQuerySingle<{0}>"; } }
     internal override string DataServiceActionQueryOfTStructureTemplate { get { return "global::Microsoft.OData.Client.DataServiceActionQuery<{0}>"; } }
@@ -3137,7 +3159,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-    public partial class <#= fixedContainerName #> : global::Microsoft.OData.Client.DataServiceContext
+    <#= ClassAccessModifier #> partial class <#= fixedContainerName #> : global::Microsoft.OData.Client.DataServiceContext
     {
 <#+
     }
@@ -3149,7 +3171,7 @@ namespace <#= fullNamespace #>
         /// Initialize a new <#= containerName #> object.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.OData.Client.Design.T4", "<#=T4Version#>")]
-        public <#= fixedContainerName #>(global::System.Uri serviceRoot) : 
+        <#= ClassAccessModifier #> <#= fixedContainerName #>(global::System.Uri serviceRoot) : 
                 base(serviceRoot, global::Microsoft.OData.Client.ODataProtocolVersion.V4)
         {
 <#+
@@ -3289,19 +3311,19 @@ namespace <#= fullNamespace #>
         /// <summary>
         /// Initialize a new <#= singleTypeName #> object.
         /// </summary>
-        public <#= singleTypeName #>(global::Microsoft.OData.Client.DataServiceContext context, string path)
+        <#= ClassAccessModifier #> <#= singleTypeName #>(global::Microsoft.OData.Client.DataServiceContext context, string path)
             : base(context, path) {}
 
         /// <summary>
         /// Initialize a new <#= singleTypeName #> object.
         /// </summary>
-        public <#= singleTypeName #>(global::Microsoft.OData.Client.DataServiceContext context, string path, bool isComposable)
+        <#= ClassAccessModifier #> <#= singleTypeName #>(global::Microsoft.OData.Client.DataServiceContext context, string path, bool isComposable)
             : base(context, path, isComposable) {}
 
         /// <summary>
         /// Initialize a new <#= singleTypeName #> object.
         /// </summary>
-        public <#= singleTypeName #>(<#= baseTypeName #> query)
+        <#= ClassAccessModifier #> <#= singleTypeName #>(<#= baseTypeName #> query)
             : base(query) {}
 
 <#+
@@ -3322,7 +3344,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public global::Microsoft.OData.Client.DataServiceQuery<<#= entitySetElementTypeName #>> <#= entitySetFixedName #>
+        <#= ClassAccessModifier #> global::Microsoft.OData.Client.DataServiceQuery<<#= entitySetElementTypeName #>> <#= entitySetFixedName #>
         {
             get
             {
@@ -3364,7 +3386,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= singletonElementTypeName #> <#= singletonFixedName #>
+        <#= ClassAccessModifier #> <#= singletonElementTypeName #> <#= singletonFixedName #>
         {
             get
             {
@@ -3398,7 +3420,7 @@ namespace <#= fullNamespace #>
         /// There are no comments for <#= entitySetName #> in the schema.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.OData.Client.Design.T4", "<#=T4Version#>")]
-        public void AddTo<#= entitySetName #>(<#= typeName #> <#= parameterName #>)
+        <#= ClassAccessModifier #> void AddTo<#= entitySetName #>(<#= typeName #> <#= parameterName #>)
         {
             base.AddObject("<#= originalEntitySetName #>", <#= parameterName #>);
         }
@@ -3435,7 +3457,7 @@ namespace <#= fullNamespace #>
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.OData.Client.Design.T4", "<#=T4Version#>")]
             private const string Edmx = @"<#= escapedEdmxString #>";
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.OData.Client.Design.T4", "<#=T4Version#>")]
-            public static global::Microsoft.OData.Edm.IEdmModel GetInstance()
+            <#= ClassAccessModifier #> static global::Microsoft.OData.Edm.IEdmModel GetInstance()
             {
                 return ParsedModel;
             }
@@ -3560,7 +3582,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-    public<#= abstractModifier #> partial class <#= typeName #><#= baseTypeName #>
+    <#= ClassAccessModifier #><#= abstractModifier #> partial class <#= typeName #><#= baseTypeName #>
     {
 <#+
     }
@@ -3585,7 +3607,7 @@ namespace <#= fullNamespace #>
     {
 #>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.OData.Client.Design.T4", "<#=T4Version#>")]
-        public static <#= fixedTypeName #> Create<#= typeName #>(<#+
+        <#= ClassAccessModifier #> static <#= fixedTypeName #> Create<#= typeName #>(<#+
     }
 
     internal override void WriteParameterForStaticCreateMethod(string parameterTypeName, string parameterName, string parameterSeparater)
@@ -3641,7 +3663,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= propertyType #> <#= fixedPropertyName #>
+        <#= ClassAccessModifier #> <#= propertyType #> <#= fixedPropertyName #>
         {
             get
             {
@@ -3676,7 +3698,7 @@ namespace <#= fullNamespace #>
         /// This event is raised when the value of the property is changed
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.OData.Client.Design.T4", "<#=T4Version#>")]
-        public event global::System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        <#= ClassAccessModifier #> event global::System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         /// <summary>
         /// The value of the property is changed
         /// </summary>
@@ -3724,7 +3746,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-    public enum <#= enumName #><#= underlyingType #>
+    <#= ClassAccessModifier #> enum <#= enumName #><#= underlyingType #>
     {
 <#+
     }
@@ -3763,7 +3785,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public global::Microsoft.OData.Client.DataServiceQuery<<#= returnTypeName #>> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
+        <#= ClassAccessModifier #> global::Microsoft.OData.Client.DataServiceQuery<<#= returnTypeName #>> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
         {
             return this.CreateFunctionQuery<<#= returnTypeName #>>("", "<#= originalFunctionName #>", <#= isComposable.ToString().ToLower(CultureInfo.InvariantCulture) #><#= string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues #>);
         }
@@ -3784,7 +3806,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.InvariantCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName) #> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
+        <#= ClassAccessModifier #> <#= isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.InvariantCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName) #> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
         {
             return <#= isReturnEntity ? "new " + returnTypeName + this.singleSuffix + "(" : string.Empty #>this.CreateFunctionQuerySingle<<#= returnTypeName #>>("", "<#= originalFunctionName #>", <#= isComposable.ToString().ToLower(CultureInfo.InvariantCulture) #><#= string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues #>)<#= isReturnEntity ? ")" : string.Empty #>;
         }
@@ -3805,7 +3827,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= hideBaseMethod ? this.OverloadsModifier : string.Empty #>global::Microsoft.OData.Client.DataServiceQuery<<#= returnTypeName #>> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
+        <#= ClassAccessModifier #> <#= hideBaseMethod ? this.OverloadsModifier : string.Empty #>global::Microsoft.OData.Client.DataServiceQuery<<#= returnTypeName #>> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
         {
             global::System.Uri requestUri;
             Context.TryGetUri(this, out requestUri);
@@ -3828,7 +3850,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= hideBaseMethod ? this.OverloadsModifier : string.Empty #> <#= isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.InvariantCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName) #> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
+        <#= ClassAccessModifier #> <#= hideBaseMethod ? this.OverloadsModifier : string.Empty #> <#= isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.InvariantCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName) #> <#= functionName #>(<#= parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
         {
             global::System.Uri requestUri;
             Context.TryGetUri(this, out requestUri);
@@ -3852,7 +3874,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= returnTypeName #> <#= actionName #>(<#= parameters #>)
+        <#= ClassAccessModifier #> <#= returnTypeName #> <#= actionName #>(<#= parameters #>)
         {
             return new <#= returnTypeName #>(this, this.BaseUri.OriginalString.Trim('/') + "/<#= originalActionName #>"<#= string.IsNullOrEmpty(parameterValues) ? string.Empty : ", " + parameterValues #>);
         }
@@ -3873,7 +3895,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public <#= hideBaseMethod ? this.OverloadsModifier : string.Empty #><#= returnTypeName #> <#= actionName #>(<#= parameters #>)
+        <#= ClassAccessModifier #> <#= hideBaseMethod ? this.OverloadsModifier : string.Empty #><#= returnTypeName #> <#= actionName #>(<#= parameters #>)
         {
             global::Microsoft.OData.Client.EntityDescriptor resource = Context.EntityTracker.TryGetEntityDescriptor(this);
             if (resource == null)
@@ -3892,7 +3914,7 @@ namespace <#= fullNamespace #>
     /// <summary>
     /// Class containing all extension methods
     /// </summary>
-    public static class ExtensionMethods
+    <#= ClassAccessModifier #> static class ExtensionMethods
     {
 <#+ 
     }
@@ -3912,7 +3934,7 @@ namespace <#= fullNamespace #>
         /// </summary>
         /// <param name="source">source entity set</param>
         /// <param name="keys">dictionary with the names and values of keys</param>
-        public static <#= returnTypeName #> ByKey(this global::Microsoft.OData.Client.DataServiceQuery<<#= entityTypeName #>> source, global::System.Collections.Generic.Dictionary<string, object> keys)
+        <#= ClassAccessModifier #> static <#= returnTypeName #> ByKey(this global::Microsoft.OData.Client.DataServiceQuery<<#= entityTypeName #>> source, global::System.Collections.Generic.Dictionary<string, object> keys)
         {
             return new <#= returnTypeName #>(source.Context, source.GetKeyPath(global::Microsoft.OData.Client.Serializer.GetKeyString(source.Context, keys)));
         }
@@ -3928,7 +3950,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public static <#= returnTypeName #> ByKey(this global::Microsoft.OData.Client.DataServiceQuery<<#= entityTypeName #>> source,
+        <#= ClassAccessModifier #> static <#= returnTypeName #> ByKey(this global::Microsoft.OData.Client.DataServiceQuery<<#= entityTypeName #>> source,
             <#= keyParameters #>)
         {
             global::System.Collections.Generic.Dictionary<string, object> keys = new global::System.Collections.Generic.Dictionary<string, object>
@@ -3947,7 +3969,7 @@ namespace <#= fullNamespace #>
         /// Cast an entity of type <#= baseTypeName #> to its derived type <#= derivedTypeFullName #>
         /// </summary>
         /// <param name="source">source entity</param>
-        public static <#= returnTypeName #> CastTo<#= derivedTypeName #>(this global::Microsoft.OData.Client.DataServiceQuerySingle<<#= baseTypeName #>> source)
+        <#= ClassAccessModifier #> static <#= returnTypeName #> CastTo<#= derivedTypeName #>(this global::Microsoft.OData.Client.DataServiceQuerySingle<<#= baseTypeName #>> source)
         {
             global::Microsoft.OData.Client.DataServiceQuerySingle<<#= derivedTypeFullName #>> query = source.CastTo<<#= derivedTypeFullName #>>();
             return new <#= returnTypeName #>(source.Context, query.GetPath(null));
@@ -3969,7 +3991,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public static <#= isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.InvariantCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName) #> <#= functionName #>(this <#= boundTypeName #> source<#= string.IsNullOrEmpty(parameters) ? string.Empty : ", " + parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
+        <#= ClassAccessModifier #> static <#= isReturnEntity ? returnTypeName + this.singleSuffix : string.Format(CultureInfo.InvariantCulture, this.DataServiceQuerySingleStructureTemplate, returnTypeName) #> <#= functionName #>(this <#= boundTypeName #> source<#= string.IsNullOrEmpty(parameters) ? string.Empty : ", " + parameters #><#= useEntityReference ? ", bool useEntityReference = false" : string.Empty #>)
         {
             if (!source.IsComposable)
             {
@@ -3995,7 +4017,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public static global::Microsoft.OData.Client.DataServiceQuery<<#= returnTypeName #>> <#= functionName #>(this <#= boundTypeName #> source<#= string.IsNullOrEmpty(parameters) ? string.Empty : ", " + parameters #><#= useEntityReference ? ", bool useEntityReference = true" : string.Empty #>)
+        <#= ClassAccessModifier #> static global::Microsoft.OData.Client.DataServiceQuery<<#= returnTypeName #>> <#= functionName #>(this <#= boundTypeName #> source<#= string.IsNullOrEmpty(parameters) ? string.Empty : ", " + parameters #><#= useEntityReference ? ", bool useEntityReference = true" : string.Empty #>)
         {
             if (!source.IsComposable)
             {
@@ -4021,7 +4043,7 @@ namespace <#= fullNamespace #>
 <#+
         }
 #>
-        public static <#= returnTypeName #> <#= actionName #>(this <#= boundSourceType #> source<#= string.IsNullOrEmpty(parameters) ? string.Empty : ", " + parameters #>)
+        <#= ClassAccessModifier #> static <#= returnTypeName #> <#= actionName #>(this <#= boundSourceType #> source<#= string.IsNullOrEmpty(parameters) ? string.Empty : ", " + parameters #>)
         {
             if (!source.IsComposable)
             {
@@ -4055,6 +4077,8 @@ public sealed class ODataClientVBTemplate : ODataClientTemplate
     internal override string GlobalPrefix { get { return string.Empty; } }
     internal override string SystemTypeTypeName { get { return "Global.System.Type"; } }
     internal override string AbstractModifier { get { return " MustInherit"; } }
+	internal override string PublicAccessModifier { get { return "Public"; } }
+	internal override string InternalAccessModifier { get { return "Friend"; } }
     internal override string DataServiceActionQueryTypeName { get { return "Global.Microsoft.OData.Client.DataServiceActionQuery"; } }
     internal override string DataServiceActionQuerySingleOfTStructureTemplate { get { return "Global.Microsoft.OData.Client.DataServiceActionQuerySingle(Of {0})"; } }
     internal override string DataServiceActionQueryOfTStructureTemplate { get { return "Global.Microsoft.OData.Client.DataServiceActionQuery(Of {0})"; } }
@@ -4188,7 +4212,7 @@ Namespace <#= fullNamespace #>
 <#+
         }
 #>
-    Partial Public Class <#= fixedContainerName #>
+    Partial <#= ClassAccessModifier #> Class <#= fixedContainerName #>
         Inherits Global.Microsoft.OData.Client.DataServiceContext
 <#+
     }
@@ -4602,7 +4626,7 @@ Namespace <#= fullNamespace #>
 <#+
         }
 #>
-    Partial Public<#= abstractModifier #> Class <#= typeName #><#= baseTypeName #>
+    Partial <#= ClassAccessModifier #><#= abstractModifier #> Class <#= typeName #><#= baseTypeName #>
 <#+
     }
 
