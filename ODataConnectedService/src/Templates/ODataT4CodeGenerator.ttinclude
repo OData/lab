@@ -4792,7 +4792,7 @@ Namespace <#= fullNamespace #>
 <#+
         }
 #>
-    Public Enum <#= enumName #><#= underlyingType #>
+    <#= ClassAccessModifier #> Enum <#= enumName #><#= underlyingType #>
 <#+
     }
 
@@ -4951,7 +4951,7 @@ Namespace <#= fullNamespace #>
     ''' <summary>
     ''' Class containing all extension methods
     ''' </summary>
-    Public Module ExtensionMethods
+    <#= ClassAccessModifier #> Module ExtensionMethods
 <#+
     }
 
