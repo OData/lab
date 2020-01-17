@@ -66,7 +66,7 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
                 text = Regex.Replace(text, "(public const string TargetLanguage = )\"OutputLanguage\";", "$1\"CSharp\";");
                 text = Regex.Replace(text, "(public const bool EnableNamingAlias = )true;", "$1" + this.ServiceConfiguration.EnableNamingAlias.ToString().ToLower(CultureInfo.InvariantCulture) + ";");
                 text = Regex.Replace(text, "(public const bool IgnoreUnexpectedElementsAndAttributes = )true;", "$1" + this.ServiceConfiguration.IgnoreUnexpectedElementsAndAttributes.ToString().ToLower(CultureInfo.InvariantCulture) + ";");
-
+                text = Regex.Replace(text, "(public const bool MakeTypesInternal = )false;", "$1" + ServiceConfiguration.MakeTypesInternal.ToString().ToLower(CultureInfo.InvariantCulture) + ";");
                 await writer.WriteAsync(text);
                 await writer.FlushAsync();
             }
@@ -85,6 +85,7 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
             t4CodeGenerator.IgnoreUnexpectedElementsAndAttributes = this.ServiceConfiguration.IgnoreUnexpectedElementsAndAttributes;
             t4CodeGenerator.EnableNamingAlias = this.ServiceConfiguration.EnableNamingAlias;
             t4CodeGenerator.NamespacePrefix = this.ServiceConfiguration.NamespacePrefix;
+            t4CodeGenerator.MakeTypesInternal = ServiceConfiguration.MakeTypesInternal;
 
             string tempFile = Path.GetTempFileName();
 
