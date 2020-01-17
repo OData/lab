@@ -48,7 +48,7 @@ THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             TargetLanguage = this.TargetLanguage,
             EnableNamingAlias = this.EnableNamingAlias,
             IgnoreUnexpectedElementsAndAttributes = this.IgnoreUnexpectedElementsAndAttributes,
-			MakeClassesInternal = true
+			MakeTypesInternal = this.MakeTypesInternal
         };
     }
     else
@@ -65,7 +65,7 @@ THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             TargetLanguage = this.TargetLanguage,
             EnableNamingAlias = this.EnableNamingAlias,
             IgnoreUnexpectedElementsAndAttributes = this.IgnoreUnexpectedElementsAndAttributes,
-			MakeClassesInternal = true
+			MakeTypesInternal = this.MakeTypesInternal
         };
     }
 
@@ -216,6 +216,16 @@ public bool IgnoreUnexpectedElementsAndAttributes
 }
 
 /// <summary>
+/// true to use the "internal" access modifier ("Friend" in VB) on generated types,
+/// otherwise "public" is used
+/// </summary>
+public bool MakeTypesInternal
+{
+	get;
+	set;
+}
+
+/// <summary>
 /// Generate code targeting a specific .Net Framework language.
 /// </summary>
 public enum LanguageOption
@@ -308,6 +318,26 @@ public void ValidateAndSetIgnoreUnexpectedElementsAndAttributesFromString(string
 }
 
 /// <summary>
+/// Set the MakeTypesInternal property with the given value.
+/// </summary>
+/// <param name="stringValue">The value to set.</param>
+public void ValidateAndSetMakeTypesInternalFromString(string stringValue)
+{
+    bool boolValue;
+    if (!bool.TryParse(stringValue, out boolValue))
+    {
+        // ********************************************************************************************************
+        // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
+        // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
+        // value then hit Ctrl-S to save the .tt file to refresh the code generation.
+        // ********************************************************************************************************
+        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the MakeTypesInternal parameter because it is not a valid boolean value.", stringValue));
+    }
+
+    this.MakeTypesInternal = boolValue;
+}
+
+/// <summary>
 /// Reads the parameter values from the Configuration class and applies them.
 /// </summary>
 private void ApplyParametersFromConfigurationClass()
@@ -318,6 +348,7 @@ private void ApplyParametersFromConfigurationClass()
     this.ValidateAndSetTargetLanguageFromString(Configuration.TargetLanguage);
     this.EnableNamingAlias = Configuration.EnableNamingAlias;
     this.IgnoreUnexpectedElementsAndAttributes = Configuration.IgnoreUnexpectedElementsAndAttributes;
+	this.MakeTypesInternal = Configuration.MakeTypesInternal;
 }
 
 /// <summary>
@@ -365,6 +396,12 @@ private void ApplyParametersFromCommandLine()
     {
         this.ValidateAndSetIgnoreUnexpectedElementsAndAttributesFromString(ignoreUnexpectedElementsAndAttributes);
     }
+
+	string makeTypesInternal = this.Host.ResolveParameterValue("notempty", "notempty", "MakeTypesInternal");
+	if (!string.IsNullOrEmpty(makeTypesInternal))
+	{
+		this.ValidateAndSetMakeTypesInternalFromString(makeTypesInternal);
+	}
 }
 
 /// <summary>
@@ -679,7 +716,7 @@ public class CodeGenerationContext
 	/// true to use internal access modifier for generated classes, otherwise they will be made public.
 	/// This is useful if you don't want the generated classes to be visible outside the assembly
 	/// </summary>
-	public bool MakeClassesInternal
+	public bool MakeTypesInternal
 	{
 		get;
 		set;
@@ -1093,7 +1130,7 @@ public abstract class ODataClientTemplate : TemplateBase
 
 	internal string ClassAccessModifier {
 		get {
-			return this.context.MakeClassesInternal ? this.InternalAccessModifier : this.PublicAccessModifier;
+			return this.context.MakeTypesInternal ? this.InternalAccessModifier : this.PublicAccessModifier;
 		}
 	}
 

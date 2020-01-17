@@ -77,6 +77,7 @@ namespace Microsoft.OData.ConnectedService
                         advancedSettingsViewModel.UseNamespacePrefix = serviceConfig.UseNameSpacePrefix;
                         advancedSettingsViewModel.NamespacePrefix = serviceConfig.NamespacePrefix;
                         advancedSettingsViewModel.UseDataServiceCollection = serviceConfig.UseDataServiceCollection;
+                        advancedSettingsViewModel.MakeTypesInternal = serviceConfig.MakeTypesInternal;
 
                         if (serviceConfig.EdmxVersion == Common.Constants.EdmxVersion4)
                         {
@@ -132,6 +133,7 @@ namespace Microsoft.OData.ConnectedService
             serviceConfiguration.UseDataServiceCollection = AdvancedSettingsViewModel.UseDataServiceCollection;
             serviceConfiguration.GeneratedFileNamePrefix = AdvancedSettingsViewModel.GeneratedFileName;
             serviceConfiguration.UseNameSpacePrefix = AdvancedSettingsViewModel.UseNamespacePrefix;
+            serviceConfiguration.MakeTypesInternal = AdvancedSettingsViewModel.MakeTypesInternal;
             if (AdvancedSettingsViewModel.UseNamespacePrefix && !string.IsNullOrEmpty(AdvancedSettingsViewModel.NamespacePrefix))
             {
                 serviceConfiguration.NamespacePrefix = AdvancedSettingsViewModel.NamespacePrefix;

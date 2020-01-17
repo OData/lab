@@ -36,6 +36,10 @@
                          HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" Width="250" Margin="20, 0, 0, 5"/>
                 <CheckBox x:Name="UseDSC" Content="Enable entity and property tracking" IsChecked="{Binding UseDataServiceCollection}"
                           HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0, 5, 0, 0" />
+                <CheckBox x:Name="MakeTypesInternal" IsChecked="{Binding MakeTypesInternal}"
+                    HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0, 5">
+                    <TextBlock TextWrapping="Wrap" Margin="0, 0, 40, 0">Make generated types internal (Enable this if you don't want to expose the generated types outside of your assembly.)</TextBlock>
+                </CheckBox>
             </StackPanel>
             <StackPanel x:Name="AdvancedSettingsForv4" HorizontalAlignment="Left" Margin="10, 5, 0, 0" VerticalAlignment="Top">
                 <CheckBox x:Name="EnableCamelCase" Content="Use c# casing style" IsChecked="{Binding EnableNamingAlias}"
