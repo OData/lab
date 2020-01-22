@@ -26,11 +26,11 @@ namespace ODataConnectedService.Tests.CodeGeneration
             {
                 Directory.Delete(TestProjectRootPath, true);
             }
-            catch (System.IO.DirectoryNotFoundException) { }
+            catch (DirectoryNotFoundException) { }
         }
 
         [TestMethod]
-        public void TestAddGeneratedCSharpCodePassesServiceConfigOptionsToCodeGenerator()
+        public void TestAddGeneratedClientCode_PassesServiceConfigOptionsToCodeGenerator()
         {
             var handlerHelper = new TestConnectedServiceHandlerHelper();
             var codeGenFactory = new TestODataT4CodeGeneratorFactory();
@@ -41,10 +41,11 @@ namespace ODataConnectedService.Tests.CodeGeneration
                 IgnoreUnexpectedElementsAndAttributes = true,
                 EnableNamingAlias = true,
                 NamespacePrefix = "Prefix",
-                MakeTypesInternal = true
+                MakeTypesInternal = true,
+                IncludeT4File = false
             };
-            var codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, "TestService", handlerHelper);
-            codeGenDescriptor.AddGeneratedCSharpCode(codeGenFactory).Wait();
+            var codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, "TestService", codeGenFactory, handlerHelper);
+            codeGenDescriptor.AddGeneratedClientCode().Wait();
             var generator = codeGenFactory.LastCreatedInstance;
             Assert.AreEqual(true, generator.UseDataServiceCollection);
             Assert.AreEqual(true, generator.EnableNamingAlias);
@@ -59,10 +60,11 @@ namespace ODataConnectedService.Tests.CodeGeneration
                 IgnoreUnexpectedElementsAndAttributes = false,
                 EnableNamingAlias = false,
                 NamespacePrefix = null,
-                MakeTypesInternal = false
+                MakeTypesInternal = false,
+                IncludeT4File = false
             };
-            codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, "TestService", handlerHelper);
-            codeGenDescriptor.AddGeneratedCSharpCode(codeGenFactory).Wait();
+            codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, "TestService", codeGenFactory, handlerHelper);
+            codeGenDescriptor.AddGeneratedClientCode().Wait();
             generator = codeGenFactory.LastCreatedInstance;
             Assert.AreEqual(false, generator.UseDataServiceCollection);
             Assert.AreEqual(false, generator.EnableNamingAlias);
@@ -73,7 +75,7 @@ namespace ODataConnectedService.Tests.CodeGeneration
         }
 
         [TestMethod]
-        public void TestAddGeneratedCSharpCodeGeneratesAndSavesCodeFile()
+        public void TestAddGeneratedClientCode_GeneratesAndSavesCodeFile()
         {
             var serviceName = "MyService";
             ServiceConfiguration serviceConfig = new ServiceConfigurationV4()
@@ -81,20 +83,23 @@ namespace ODataConnectedService.Tests.CodeGeneration
                 MakeTypesInternal = true,
                 UseDataServiceCollection = false,
                 ServiceName = serviceName,
-                GeneratedFileNamePrefix = "MyFile"
+                GeneratedFileNamePrefix = "MyFile",
+                IncludeT4File = false
             };
             var handlerHelper = new TestConnectedServiceHandlerHelper();
-            var codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, serviceName, handlerHelper);
-            codeGenDescriptor.AddGeneratedCSharpCode(new TestODataT4CodeGeneratorFactory()).Wait();
+            var codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, serviceName,
+                new TestODataT4CodeGeneratorFactory(), handlerHelper);
+            codeGenDescriptor.AddGeneratedClientCode().Wait();
             using (var reader = new StreamReader(handlerHelper.AddedFileInputFileName))
             {
                 var generatedCode = reader.ReadToEnd();
                 Assert.AreEqual("Generated code", generatedCode);
-                Assert.AreEqual(Path.Combine(TestProjectRootPath, ServicesRootFolder, serviceName, "MyFile.cs"), handlerHelper.AddedFileTargetFilePath);
+                Assert.AreEqual(Path.Combine(TestProjectRootPath, ServicesRootFolder, serviceName, "MyFile.cs"),
+                    handlerHelper.AddedFileTargetFilePath);
             }
         }
 
-        static V4CodeGenDescriptor SetupCodeGenDescriptor(ServiceConfiguration serviceConfig, string serviceName, TestConnectedServiceHandlerHelper handlerHelper)
+        static V4CodeGenDescriptor SetupCodeGenDescriptor(ServiceConfiguration serviceConfig, string serviceName, IODataT4CodeGeneratorFactory codeGenFactory, TestConnectedServiceHandlerHelper handlerHelper)
         {
             var referenceFolderPath = Path.Combine(TestProjectRootPath, ServicesRootFolder, serviceName);
             Directory.CreateDirectory(referenceFolderPath);
@@ -107,7 +112,7 @@ namespace ODataConnectedService.Tests.CodeGeneration
             handlerHelper.ServicesRootFolder = ServicesRootFolder;
             ConnectedServiceHandlerContext context = new TestConnectedServiceHandlerContext(serviceInstance, handlerHelper);
 
-            return new TestV4CodeGenDescriptor(MetadataUri, context, project);
+            return new TestV4CodeGenDescriptor(MetadataUri, context, project, codeGenFactory);
         }
 
         static Project CreateTestProject(string projectPath)
@@ -126,8 +131,8 @@ namespace ODataConnectedService.Tests.CodeGeneration
 
     class TestV4CodeGenDescriptor: V4CodeGenDescriptor
     {
-        public TestV4CodeGenDescriptor(string metadataUri, ConnectedServiceHandlerContext context, Project project)
-            : base(metadataUri, context, project)
+        public TestV4CodeGenDescriptor(string metadataUri, ConnectedServiceHandlerContext context, Project project, IODataT4CodeGeneratorFactory codeGenFactory)
+            : base(metadataUri, context, project, codeGenFactory)
         {
         }
         protected override void Init() { }
@@ -178,6 +183,11 @@ namespace ODataConnectedService.Tests.CodeGeneration
         {
             ServiceInstance = serviceInstance;
             HandlerHelper = handlerHelper;
+
+            var mockLogger = new Mock<ConnectedServiceLogger>();
+            mockLogger.Setup(l => l.WriteMessageAsync(It.IsAny<LoggerMessageCategory>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+            Logger = mockLogger.Object;
         }
         public override IDictionary<string, object> Args => throw new System.NotImplementedException();
 
