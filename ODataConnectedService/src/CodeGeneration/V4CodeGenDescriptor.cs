@@ -15,13 +15,16 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
 {
     internal class V4CodeGenDescriptor : BaseCodeGenDescriptor
     {
-        public V4CodeGenDescriptor(string metadataUri, ConnectedServiceHandlerContext context, Project project)
+        public V4CodeGenDescriptor(string metadataUri, ConnectedServiceHandlerContext context, Project project, IODataT4CodeGeneratorFactory codeGeneratorFactory)
             : base(metadataUri, context, project)
         {
-            this.ClientNuGetPackageName = Common.Constants.V4ClientNuGetPackage;
-            this.ClientDocUri = Common.Constants.V4DocUri;
-            this.ServiceConfiguration = base.ServiceConfiguration as ServiceConfigurationV4;
+            ClientNuGetPackageName = Common.Constants.V4ClientNuGetPackage;
+            ClientDocUri = Common.Constants.V4DocUri;
+            ServiceConfiguration = base.ServiceConfiguration as ServiceConfigurationV4;
+            CodeGeneratorFactory = codeGeneratorFactory;
         }
+
+        private IODataT4CodeGeneratorFactory CodeGeneratorFactory { get; set; }
 
         private new ServiceConfigurationV4 ServiceConfiguration { get; set; }
         
@@ -46,7 +49,7 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
             }
             else
             {
-                await AddGeneratedCSharpCode(new ODataT4CodeGeneratorFactory());
+                await AddGeneratedCSharpCode();
             }
         }
 
@@ -76,9 +79,9 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
             await this.Context.HandlerHelper.AddFileAsync(tempFile, Path.Combine(referenceFolder, this.GeneratedFileNamePrefix + ".tt"));
         }
 
-        public async Task AddGeneratedCSharpCode(IODataT4CodeGeneratorFactory codeGeneratorFactory)
+        private async Task AddGeneratedCSharpCode()
         {
-            ODataT4CodeGenerator t4CodeGenerator = codeGeneratorFactory.Create();
+            ODataT4CodeGenerator t4CodeGenerator = CodeGeneratorFactory.Create();
             t4CodeGenerator.MetadataDocumentUri = MetadataUri;
             t4CodeGenerator.UseDataServiceCollection = this.ServiceConfiguration.UseDataServiceCollection;
             t4CodeGenerator.TargetLanguage = ODataT4CodeGenerator.LanguageOption.CSharp;
