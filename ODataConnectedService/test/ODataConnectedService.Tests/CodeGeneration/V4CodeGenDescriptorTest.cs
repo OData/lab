@@ -9,6 +9,7 @@ using Microsoft.OData.ConnectedService;
 using Microsoft.OData.ConnectedService.CodeGeneration;
 using Microsoft.OData.ConnectedService.Models;
 using Microsoft.OData.ConnectedService.Templates;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace ODataConnectedService.Tests.CodeGeneration
 {
@@ -179,16 +180,20 @@ namespace ODataConnectedService.Tests.CodeGeneration
     
     class TestConnectedServiceHandlerContext: ConnectedServiceHandlerContext
     {
-        public TestConnectedServiceHandlerContext(ConnectedServiceInstance serviceInstance, ConnectedServiceHandlerHelper handlerHelper ): base()
+        public TestConnectedServiceHandlerContext(ConnectedServiceInstance serviceInstance = null,
+            ConnectedServiceHandlerHelper handlerHelper = null, IVsHierarchy projectHierarchy = null ): base()
         {
             ServiceInstance = serviceInstance;
             HandlerHelper = handlerHelper;
+            ProjectHierarchy = projectHierarchy;
 
             var mockLogger = new Mock<ConnectedServiceLogger>();
             mockLogger.Setup(l => l.WriteMessageAsync(It.IsAny<LoggerMessageCategory>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
             Logger = mockLogger.Object;
         }
+
+        public object SavedExtendedDesignData { get; private set; }
         public override IDictionary<string, object> Args => throw new System.NotImplementedException();
 
         public override EditableXmlConfigHelper CreateEditableXmlConfigHelper()
@@ -208,7 +213,7 @@ namespace ODataConnectedService.Tests.CodeGeneration
 
         public override void SetExtendedDesignerData<TData>(TData data)
         {
-            throw new System.NotImplementedException();
+            SavedExtendedDesignData = data;
         }
     }
 }

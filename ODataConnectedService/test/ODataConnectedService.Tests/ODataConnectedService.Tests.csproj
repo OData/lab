@@ -49,6 +49,7 @@
     <Compile Include="CodeGeneration\V4CodeGenDescriptorTest.cs" />
     <Compile Include="Templates\ODataT4CodeGeneratorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ODataConnectedServiceHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.ConnectedServices">
