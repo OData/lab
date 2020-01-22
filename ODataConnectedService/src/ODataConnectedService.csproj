@@ -164,6 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGeneration\BaseCodeGenDescriptor.cs" />
+    <Compile Include="CodeGeneration\CodeGenDescriptorFactory.cs" />
+    <Compile Include="CodeGeneration\ICodeGenDescriptorFactory.cs" />
     <Compile Include="CodeGeneration\V3CodeGenDescriptor.cs" />
     <Compile Include="CodeGeneration\V4CodeGenDescriptor.cs" />
     <Compile Include="Common\CodeGeneratorUtils.cs" />
