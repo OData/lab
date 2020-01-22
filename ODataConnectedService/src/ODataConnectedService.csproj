@@ -178,11 +178,13 @@
     <Compile Include="ODataConnectedServiceProvider.cs" />
     <Compile Include="ODataConnectedServiceWizard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Templates\IODataT4CodeGeneratorFactory.cs" />
     <Compile Include="Templates\ODataT4CodeGenerator.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ODataT4CodeGenerator.tt</DependentUpon>
     </Compile>
+    <Compile Include="Templates\ODataT4CodeGeneratorFactory.cs" />
     <Compile Include="ViewModels\AdvancedSettingsViewModel.cs" />
     <Compile Include="ViewModels\ConfigODataEndpointViewModel.cs" />
     <Compile Include="Views\AdvancedSettings.xaml.cs">
