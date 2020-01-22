@@ -2,8 +2,10 @@
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.CodeDom.Compiler;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.OData.ConnectedService.Templates;
+using Microsoft.CSharp;
 
 namespace ODataConnectedService.Tests.Templates
 {

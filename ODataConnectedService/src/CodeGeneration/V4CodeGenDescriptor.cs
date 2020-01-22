@@ -46,7 +46,7 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
             }
             else
             {
-                await AddGeneratedCSharpCode();
+                await AddGeneratedCSharpCode(new ODataT4CodeGeneratorFactory());
             }
         }
 
@@ -76,9 +76,9 @@ namespace Microsoft.OData.ConnectedService.CodeGeneration
             await this.Context.HandlerHelper.AddFileAsync(tempFile, Path.Combine(referenceFolder, this.GeneratedFileNamePrefix + ".tt"));
         }
 
-        private async Task AddGeneratedCSharpCode()
+        public async Task AddGeneratedCSharpCode(IODataT4CodeGeneratorFactory codeGeneratorFactory)
         {
-            ODataT4CodeGenerator t4CodeGenerator = new ODataT4CodeGenerator();
+            ODataT4CodeGenerator t4CodeGenerator = codeGeneratorFactory.Create();
             t4CodeGenerator.MetadataDocumentUri = MetadataUri;
             t4CodeGenerator.UseDataServiceCollection = this.ServiceConfiguration.UseDataServiceCollection;
             t4CodeGenerator.TargetLanguage = ODataT4CodeGenerator.LanguageOption.CSharp;
