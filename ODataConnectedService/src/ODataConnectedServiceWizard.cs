@@ -77,13 +77,13 @@ namespace Microsoft.OData.ConnectedService
                         advancedSettingsViewModel.UseNamespacePrefix = serviceConfig.UseNameSpacePrefix;
                         advancedSettingsViewModel.NamespacePrefix = serviceConfig.NamespacePrefix;
                         advancedSettingsViewModel.UseDataServiceCollection = serviceConfig.UseDataServiceCollection;
-                        advancedSettingsViewModel.MakeTypesInternal = serviceConfig.MakeTypesInternal;
 
                         if (serviceConfig.EdmxVersion == Common.Constants.EdmxVersion4)
                         {
                             advancedSettingsViewModel.IgnoreUnexpectedElementsAndAttributes = serviceConfig.IgnoreUnexpectedElementsAndAttributes;
                             advancedSettingsViewModel.EnableNamingAlias = serviceConfig.EnableNamingAlias;
                             advancedSettingsViewModel.IncludeT4File = serviceConfig.IncludeT4File;
+                            advancedSettingsViewModel.MakeTypesInternal = serviceConfig.MakeTypesInternal;
                             advancedSettings.IncludeT4File.IsEnabled = false;
                         }
                     }
