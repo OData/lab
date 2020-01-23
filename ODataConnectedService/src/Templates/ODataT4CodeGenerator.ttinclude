@@ -718,8 +718,8 @@ public class CodeGenerationContext
 	/// </summary>
 	public bool MakeTypesInternal
 	{
-		get;
-		set;
+        get;
+        set;
 	}
 
     /// <summary>
