@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.ConnectedServices;
 
-namespace ODataConnectedService.Tests.TestHelpers
+namespace Microsoft.OData.ConnectedService.Tests.TestHelpers
 {
     class TestConnectedServiceHandlerHelper : ConnectedServiceHandlerHelper
     {
