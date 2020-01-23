@@ -352,18 +352,18 @@ public enum LanguageOption
 /// <summary>
 /// Set the UseDataServiceCollection property with the given value.
 /// </summary>
-/// <param name="stringValue">The value to set.</param>
-public void ValidateAndSetUseDataServiceCollectionFromString(string stringValue)
+/// <param name="inputValue">The value to set.</param>
+public void ValidateAndSetUseDataServiceCollectionFromString(string inputValue)
 {
     bool boolValue;
-    if (!bool.TryParse(stringValue, out boolValue))
+    if (!bool.TryParse(inputValue, out boolValue))
     {
         // ********************************************************************************************************
         // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the UseDataServiceCollection parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the UseDataServiceCollection parameter because it is not a valid boolean value.", inputValue));
     }
 
     this.UseDataServiceCollection = boolValue;
@@ -372,18 +372,18 @@ public void ValidateAndSetUseDataServiceCollectionFromString(string stringValue)
 /// <summary>
 /// Tries to set the TargetLanguage property with the given value.
 /// </summary>
-/// <param name="stringValue">The value to set.</param>
-public void ValidateAndSetTargetLanguageFromString(string stringValue)
+/// <param name="inputValue">The value to set.</param>
+public void ValidateAndSetTargetLanguageFromString(string inputValue)
 {
     LanguageOption option;
-    if (!Enum.TryParse(stringValue, true, out option))
+    if (!Enum.TryParse(inputValue, true, out option))
     {
         // ********************************************************************************************************
         // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the TargetLanguage parameter because it is not a valid LanguageOption. The supported LanguageOptions are \"CSharp\" and \"VB\".", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the TargetLanguage parameter because it is not a valid LanguageOption. The supported LanguageOptions are \"CSharp\" and \"VB\".", inputValue));
     }
 
     this.TargetLanguage = option;
@@ -392,18 +392,18 @@ public void ValidateAndSetTargetLanguageFromString(string stringValue)
 /// <summary>
 /// Set the EnableNamingAlias property with the given value.
 /// </summary>
-/// <param name="stringValue">The value to set.</param>
-public void ValidateAndSetEnableNamingAliasFromString(string stringValue)
+/// <param name="inputValue">The value to set.</param>
+public void ValidateAndSetEnableNamingAliasFromString(string inputValue)
 {
     bool boolValue;
-    if (!bool.TryParse(stringValue, out boolValue))
+    if (!bool.TryParse(inputValue, out boolValue))
     {
         // ********************************************************************************************************
         // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the EnableNamingAlias parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the EnableNamingAlias parameter because it is not a valid boolean value.", inputValue));
     }
 
     this.EnableNamingAlias = boolValue;
@@ -412,18 +412,18 @@ public void ValidateAndSetEnableNamingAliasFromString(string stringValue)
 /// <summary>
 /// Set the IgnoreUnexpectedElementsAndAttributes property with the given value.
 /// </summary>
-/// <param name="stringValue">The value to set.</param>
-public void ValidateAndSetIgnoreUnexpectedElementsAndAttributesFromString(string stringValue)
+/// <param name="inputValue">The value to set.</param>
+public void ValidateAndSetIgnoreUnexpectedElementsAndAttributesFromString(string inputValue)
 {
     bool boolValue;
-    if (!bool.TryParse(stringValue, out boolValue))
+    if (!bool.TryParse(inputValue, out boolValue))
     {
         // ********************************************************************************************************
         // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the IgnoreUnexpectedElementsAndAttributes parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the IgnoreUnexpectedElementsAndAttributes parameter because it is not a valid boolean value.", inputValue));
     }
 
     this.IgnoreUnexpectedElementsAndAttributes = boolValue;
@@ -432,21 +432,21 @@ public void ValidateAndSetIgnoreUnexpectedElementsAndAttributesFromString(string
 /// <summary>
 /// Set the MakeTypesInternal property with the given value.
 /// </summary>
-/// <param name="stringValue">The value to set.</param>
-public void ValidateAndSetMakeTypesInternalFromString(string stringValue)
+/// <param name="inputValue">The value to set.</param>
+public void ValidateAndSetMakeTypesInternalFromString(string inputValue)
 {
-    bool boolValue;
-    if (!bool.TryParse(stringValue, out boolValue))
+    bool parsedValue;
+    if (!bool.TryParse(inputValue, out parsedValue))
     {
         // ********************************************************************************************************
         // To fix this error, if the current text transformation is run by the TextTemplatingFileGenerator
         // custom tool inside Visual Studio, update the .odata.config file in the project with a valid parameter
         // value then hit Ctrl-S to save the .tt file to refresh the code generation.
         // ********************************************************************************************************
-        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the MakeTypesInternal parameter because it is not a valid boolean value.", stringValue));
+        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The value \"{0}\" cannot be assigned to the MakeTypesInternal parameter because it is not a valid boolean value.", inputValue));
     }
 
-    this.MakeTypesInternal = boolValue;
+    this.MakeTypesInternal = parsedValue;
 }
 
 /// <summary>
