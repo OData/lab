@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using EnvDTE;
 using Microsoft.VisualStudio.ConnectedServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.OData.ConnectedService;
 using Microsoft.OData.ConnectedService.CodeGeneration;
-//using Microsoft.OData.ConnectedService.Common;
 using Microsoft.OData.ConnectedService.Models;
-using EnvDTE;
-using System.Threading.Tasks;
-using ODataConnectedService.Tests.CodeGeneration;
-using System.Threading;
 using Moq;
+using ODataConnectedService.Tests.TestHelpers;
 
 namespace ODataConnectedService.Tests
 {
