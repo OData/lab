@@ -23,6 +23,15 @@ This repository is for exploring new ideas and developing early prototypes of va
   **Question**: In Visual Studio 2017, upon configuring the service endpoint in the OData Connected Services extension and clicking "Finish", I get an error message that says "Cannot access".  
   **Workaround**: Most reported issues for this error are related to authentication-based endpoints. This extension does not currently support authentication. To work around, download the metadata as a text file from the endpoint and then point the OData Connected Services URI to the downloaded file.
 
+#### Unit Tests
+
+The `ODataConnectedService.Tests.sln` contains the unit tests for the OData connected service. The folder structure of the tests mirrors the folder structre
+of the `ODataConnectedService` project. The base namespace for tests is `Microsoft.OData.ConnectedService.Tests`. Furthermore each test class has the same name
+as the class it is testing, followed by the suffix `Test`.
+
+Example: for some class `Microsoft.OData.ConnectedService.X.Y` located in `src\X\Y.cs`,
+the test class would be `Microsoft.OData.Tests.ConnectedService.Tests.X.YTest` located in `test\X\YTest.cs`
+
 ### OData v4 Web API Scaffolding
 
 * [Source](https://github.com/OData/lab/tree/master/WebAPIODataV4Scaffolding)
