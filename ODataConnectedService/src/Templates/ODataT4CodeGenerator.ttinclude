@@ -221,8 +221,8 @@ public bool IgnoreUnexpectedElementsAndAttributes
 /// </summary>
 public bool MakeTypesInternal
 {
-	get;
-	set;
+    get;
+    set;
 }
 
 /// <summary>
