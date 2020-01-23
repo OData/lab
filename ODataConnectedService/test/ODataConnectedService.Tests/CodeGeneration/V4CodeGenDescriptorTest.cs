@@ -9,7 +9,7 @@ using Microsoft.OData.ConnectedService;
 using Microsoft.OData.ConnectedService.CodeGeneration;
 using Microsoft.OData.ConnectedService.Models;
 using Microsoft.OData.ConnectedService.Templates;
-using Microsoft.VisualStudio.Shell.Interop;
+using ODataConnectedService.Tests.TestHelpers;
 
 namespace ODataConnectedService.Tests.CodeGeneration
 {
@@ -30,47 +30,34 @@ namespace ODataConnectedService.Tests.CodeGeneration
             catch (DirectoryNotFoundException) { }
         }
 
-        [TestMethod]
-        public void TestAddGeneratedClientCode_PassesServiceConfigOptionsToCodeGenerator()
+        [DataTestMethod]
+        [DataRow(true, true, true, "Prefix", true)]
+        [DataRow(false, false, false, null, false)]
+        public void TestAddGeneratedClientCode_PassesServiceConfigOptionsToCodeGenerator(
+            bool useDSC, bool ignoreUnexpected, bool enableNamingAlias,
+            string namespacePrefix, bool makeTypesInternal)
         {
             var handlerHelper = new TestConnectedServiceHandlerHelper();
             var codeGenFactory = new TestODataT4CodeGeneratorFactory();
 
             var serviceConfig = new ServiceConfigurationV4()
             {
-                UseDataServiceCollection = true,
-                IgnoreUnexpectedElementsAndAttributes = true,
-                EnableNamingAlias = true,
-                NamespacePrefix = "Prefix",
-                MakeTypesInternal = true,
+                UseDataServiceCollection = useDSC,
+                IgnoreUnexpectedElementsAndAttributes = ignoreUnexpected,
+                EnableNamingAlias = enableNamingAlias,
+                NamespacePrefix = namespacePrefix,
+                MakeTypesInternal = makeTypesInternal,
                 IncludeT4File = false
             };
             var codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, "TestService", codeGenFactory, handlerHelper);
             codeGenDescriptor.AddGeneratedClientCode().Wait();
-            var generator = codeGenFactory.LastCreatedInstance;
-            Assert.AreEqual(true, generator.UseDataServiceCollection);
-            Assert.AreEqual(true, generator.EnableNamingAlias);
-            Assert.AreEqual(true, generator.MakeTypesInternal);
-            Assert.AreEqual("Prefix", generator.NamespacePrefix);
-            Assert.AreEqual(MetadataUri, generator.MetadataDocumentUri);
-            Assert.AreEqual(ODataT4CodeGenerator.LanguageOption.CSharp, generator.TargetLanguage);
 
-            serviceConfig = new ServiceConfigurationV4()
-            {
-                UseDataServiceCollection = false,
-                IgnoreUnexpectedElementsAndAttributes = false,
-                EnableNamingAlias = false,
-                NamespacePrefix = null,
-                MakeTypesInternal = false,
-                IncludeT4File = false
-            };
-            codeGenDescriptor = SetupCodeGenDescriptor(serviceConfig, "TestService", codeGenFactory, handlerHelper);
-            codeGenDescriptor.AddGeneratedClientCode().Wait();
-            generator = codeGenFactory.LastCreatedInstance;
-            Assert.AreEqual(false, generator.UseDataServiceCollection);
-            Assert.AreEqual(false, generator.EnableNamingAlias);
-            Assert.AreEqual(false, generator.MakeTypesInternal);
-            Assert.AreEqual(null, generator.NamespacePrefix);
+            var generator = codeGenFactory.LastCreatedInstance;
+            Assert.AreEqual(useDSC, generator.UseDataServiceCollection);
+            Assert.AreEqual(enableNamingAlias, generator.EnableNamingAlias);
+            Assert.AreEqual(ignoreUnexpected, generator.IgnoreUnexpectedElementsAndAttributes);
+            Assert.AreEqual(makeTypesInternal, generator.MakeTypesInternal);
+            Assert.AreEqual(namespacePrefix, generator.NamespacePrefix);
             Assert.AreEqual(MetadataUri, generator.MetadataDocumentUri);
             Assert.AreEqual(ODataT4CodeGenerator.LanguageOption.CSharp, generator.TargetLanguage);
         }
@@ -147,7 +134,7 @@ namespace ODataConnectedService.Tests.CodeGeneration
         }
     }
 
-    class TestODataT4CodeGeneratorFactory: IODataT4CodeGeneratorFactory
+    class TestODataT4CodeGeneratorFactory : IODataT4CodeGeneratorFactory
     {
         public ODataT4CodeGenerator LastCreatedInstance { get; private set; }
         public ODataT4CodeGenerator Create()
@@ -155,65 +142,6 @@ namespace ODataConnectedService.Tests.CodeGeneration
             var generator = new TestODataT4CodeGenerator();
             LastCreatedInstance = generator;
             return generator;
-        }
-    }
-
-    class TestConnectedServiceHandlerHelper: ConnectedServiceHandlerHelper
-    {
-        // used to access the temp file that the generated code was written to
-        public string AddedFileInputFileName { get; private set; }
-        // used to find out which file the final output would be written to
-        public string AddedFileTargetFilePath { get; private set; }
-        public string ServicesRootFolder { get; set; }
-        public override IDictionary<string, string> TokenReplacementValues { get; }
-        public override void AddAssemblyReference(string assemblyPath) { }
-        public override string GetServiceArtifactsRootFolder() => ServicesRootFolder;
-        public override string PerformTokenReplacement(string input, IDictionary<string, string> additionalReplacementValues = null) => "";
-
-        public override Task<string> AddFileAsync(string fileName, string targetPath, AddFileOptions addFileOptions = null)
-        {
-            AddedFileInputFileName = fileName;
-            AddedFileTargetFilePath = targetPath;
-            return Task.FromResult("");
-        }
-    }
-    
-    class TestConnectedServiceHandlerContext: ConnectedServiceHandlerContext
-    {
-        public TestConnectedServiceHandlerContext(ConnectedServiceInstance serviceInstance = null,
-            ConnectedServiceHandlerHelper handlerHelper = null, IVsHierarchy projectHierarchy = null ): base()
-        {
-            ServiceInstance = serviceInstance;
-            HandlerHelper = handlerHelper;
-            ProjectHierarchy = projectHierarchy;
-
-            var mockLogger = new Mock<ConnectedServiceLogger>();
-            mockLogger.Setup(l => l.WriteMessageAsync(It.IsAny<LoggerMessageCategory>(), It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-            Logger = mockLogger.Object;
-        }
-
-        public object SavedExtendedDesignData { get; private set; }
-        public override IDictionary<string, object> Args => throw new System.NotImplementedException();
-
-        public override EditableXmlConfigHelper CreateEditableXmlConfigHelper()
-        {
-            return null;
-        }
-
-        public override XmlConfigHelper CreateReadOnlyXmlConfigHelper()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override TData GetExtendedDesignerData<TData>()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void SetExtendedDesignerData<TData>(TData data)
-        {
-            SavedExtendedDesignData = data;
         }
     }
 }

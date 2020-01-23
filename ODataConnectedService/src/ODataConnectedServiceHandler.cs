@@ -18,9 +18,7 @@ namespace Microsoft.OData.ConnectedService
     internal class ODataConnectedServiceHandler : ConnectedServiceHandler
     {
         private ICodeGenDescriptorFactory codeGenDescriptorFactory;
-        public ODataConnectedServiceHandler(): this(new CodeGenDescriptorFactory())
-        {
-        }
+        public ODataConnectedServiceHandler(): this(new CodeGenDescriptorFactory()) {}
 
         public ODataConnectedServiceHandler(ICodeGenDescriptorFactory codeGenDescriptorFactory)
             : base()
@@ -31,31 +29,30 @@ namespace Microsoft.OData.ConnectedService
 
         public override async Task<AddServiceInstanceResult> AddServiceInstanceAsync(ConnectedServiceHandlerContext context, CancellationToken ct)
         {
-            Project project = ProjectHelper.GetProjectFromHierarchy(context.ProjectHierarchy);
-            ODataConnectedServiceInstance codeGenInstance = (ODataConnectedServiceInstance)context.ServiceInstance;
-
-            var codeGenDescriptor = await GenerateCode(codeGenDescriptorFactory, codeGenInstance.MetadataTempFilePath, codeGenInstance.ServiceConfig.EdmxVersion, context, project);
-
-            context.SetExtendedDesignerData<ServiceConfiguration>(codeGenInstance.ServiceConfig);
-
+            var codeGenDescriptor = await SaveServiceInstanceAsync(context);
             var result = new AddServiceInstanceResult(
                 context.ServiceInstance.Name,
                 new Uri(codeGenDescriptor.ClientDocUri));
-
             return result;
         }
 
         public override async Task<UpdateServiceInstanceResult> UpdateServiceInstanceAsync(ConnectedServiceHandlerContext context, CancellationToken ct)
         {
-            Project project = ProjectHelper.GetProjectFromHierarchy(context.ProjectHierarchy);
-            ODataConnectedServiceInstance codeGenInstance = (ODataConnectedServiceInstance)context.ServiceInstance;
-
-            var codeGenDescriptor = await GenerateCode(codeGenDescriptorFactory, codeGenInstance.ServiceConfig.Endpoint, codeGenInstance.ServiceConfig.EdmxVersion, context, project);
-            context.SetExtendedDesignerData<ServiceConfiguration>(codeGenInstance.ServiceConfig);
+            await SaveServiceInstanceAsync(context);
             return new UpdateServiceInstanceResult();
         }
 
-        private static async Task<BaseCodeGenDescriptor> GenerateCode(ICodeGenDescriptorFactory codeGenDescriptorFactory, string metadataUri, Version edmxVersion, ConnectedServiceHandlerContext context, Project project)
+        private async Task<BaseCodeGenDescriptor> SaveServiceInstanceAsync(ConnectedServiceHandlerContext context)
+        {
+            Project project = ProjectHelper.GetProjectFromHierarchy(context.ProjectHierarchy);
+            ODataConnectedServiceInstance serviceInstance = (ODataConnectedServiceInstance)context.ServiceInstance;
+
+            var codeGenDescriptor = await GenerateCode(serviceInstance.ServiceConfig.Endpoint, serviceInstance.ServiceConfig.EdmxVersion, context, project);
+            context.SetExtendedDesignerData<ServiceConfiguration>(serviceInstance.ServiceConfig);
+            return codeGenDescriptor;
+        }
+
+        private async Task<BaseCodeGenDescriptor> GenerateCode(string metadataUri, Version edmxVersion, ConnectedServiceHandlerContext context, Project project)
         {
             BaseCodeGenDescriptor codeGenDescriptor = codeGenDescriptorFactory.Create(edmxVersion, metadataUri, context, project);
             await codeGenDescriptor.AddNugetPackages();
