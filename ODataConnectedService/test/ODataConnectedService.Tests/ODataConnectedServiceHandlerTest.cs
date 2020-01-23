@@ -9,9 +9,9 @@ using Microsoft.OData.ConnectedService;
 using Microsoft.OData.ConnectedService.CodeGeneration;
 using Microsoft.OData.ConnectedService.Models;
 using Moq;
-using ODataConnectedService.Tests.TestHelpers;
+using Microsoft.OData.ConnectedService.Tests.TestHelpers;
 
-namespace ODataConnectedService.Tests
+namespace Microsoft.OData.ConnectedService.Tests
 {
     [TestClass]
     public class ODataConnectedServiceHandlerTest

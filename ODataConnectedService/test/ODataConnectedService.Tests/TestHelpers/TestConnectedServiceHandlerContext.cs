@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.ConnectedServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Moq;
 
-namespace ODataConnectedService.Tests.TestHelpers
+namespace Microsoft.OData.ConnectedService.Tests.TestHelpers
 {
     class TestConnectedServiceHandlerContext : ConnectedServiceHandlerContext
     {

@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Microsoft.VisualStudio.ConnectedServices;
 using EnvDTE;
 using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.OData.ConnectedService;
 using Microsoft.OData.ConnectedService.CodeGeneration;
 using Microsoft.OData.ConnectedService.Models;
 using Microsoft.OData.ConnectedService.Templates;
-using ODataConnectedService.Tests.TestHelpers;
+using Microsoft.OData.ConnectedService.Tests.TestHelpers;
 
-namespace ODataConnectedService.Tests.CodeGeneration
+namespace Microsoft.OData.ConnectedService.Tests.CodeGeneration
 {
     [TestClass]
     public class V4CodeGenDescriptorTest
