@@ -3,8 +3,6 @@
 
 using System;
 using System.Threading.Tasks;
-using EnvDTE;
-using Microsoft.OData.ConnectedService.Common;
 using Microsoft.OData.ConnectedService.Models;
 using Microsoft.OData.ConnectedService.ViewModels;
 using Microsoft.OData.ConnectedService.Views;

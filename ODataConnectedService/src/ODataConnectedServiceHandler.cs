@@ -2,12 +2,10 @@
 // Licensed under the MIT License.  See License.txt in the project root for license information.
 
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft.OData.ConnectedService.CodeGeneration;
-using Microsoft.OData.ConnectedService.Templates;
 using Microsoft.OData.ConnectedService.Common;
 using Microsoft.OData.ConnectedService.Models;
 using Microsoft.VisualStudio.ConnectedServices;
