@@ -4810,8 +4810,8 @@ this.Write(" ByKey(this global::Microsoft.OData.Client.DataServiceQuery<");
 
 this.Write(this.ToStringHelper.ToStringWithCulture(entityTypeName));
 
-this.Write("> source, global::System.Collections.Generic.Dictionary<string, object> keys)\r\n  " +
-        "      {\r\n            return new ");
+this.Write("> source, global::System.Collections.Generic.IDictionary<string, object> keys)\r\n " +
+        "       {\r\n            return new ");
 
 this.Write(this.ToStringHelper.ToStringWithCulture(returnTypeName));
 
@@ -4857,9 +4857,9 @@ this.Write("> source,\r\n            ");
 
 this.Write(this.ToStringHelper.ToStringWithCulture(keyParameters));
 
-this.Write(")\r\n        {\r\n            global::System.Collections.Generic.Dictionary<string, o" +
-        "bject> keys = new global::System.Collections.Generic.Dictionary<string, object>\r" +
-        "\n            {\r\n                ");
+this.Write(")\r\n        {\r\n            global::System.Collections.Generic.IDictionary<string, " +
+        "object> keys = new global::System.Collections.Generic.Dictionary<string, object>" +
+        "\r\n            {\r\n                ");
 
 this.Write(this.ToStringHelper.ToStringWithCulture(keyDictionaryItems));
 
