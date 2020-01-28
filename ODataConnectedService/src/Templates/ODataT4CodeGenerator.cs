@@ -333,8 +333,8 @@ public bool IgnoreUnexpectedElementsAndAttributes
 /// </summary>
 public bool MakeTypesInternal
 {
-	get;
-	set;
+    get;
+    set;
 }
 
 /// <summary>
@@ -830,8 +830,8 @@ public class CodeGenerationContext
 	/// </summary>
 	public bool MakeTypesInternal
 	{
-		get;
-		set;
+        get;
+        set;
 	}
 
     /// <summary>
@@ -1311,14 +1311,13 @@ public abstract class ODataClientTemplate : TemplateBase
                 {
                     this.WriteComplexType(complexType, boundOperationsMap);
                 }
-                else
+                else if (type is IEdmEntityType entityType)
                 {
-                    IEdmEntityType entityType = type as IEdmEntityType;
                     this.WriteEntityType(entityType, boundOperationsMap);
                 }
 
                 IEdmStructuredType structuredType = type as IEdmStructuredType;
-                if (structuredType.BaseType != null)
+                if (structuredType?.BaseType != null)
                 {
                     List<IEdmStructuredType> derivedTypes;
                     if (!structuredBaseTypeMap.TryGetValue(structuredType.BaseType, out derivedTypes))
@@ -2846,8 +2845,16 @@ internal static class Utils
                         clrTypeName = context.GetPrefixedFullName(edmEntityType,
                             context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmEntityType.Name)) : clientTemplate.GetFixedName(edmEntityType.Name), clientTemplate);
                     }
-                    else
+                    else if (edmType is IEdmTypeDefinition edmTypeDefinition)
                     {
+                        IEdmPrimitiveType underlyingType = edmTypeDefinition.UnderlyingType;
+                        clrTypeName = Utils.GetClrTypeName(underlyingType, clientTemplate);
+                        if (edmTypeReference.IsNullable && !clientTemplate.ClrReferenceTypes.Contains(underlyingType.PrimitiveKind) && addNullableTemplate)
+                        {
+                            clrTypeName = string.Format(CultureInfo.InvariantCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
+                        }
+                    }
+                    else {
                         IEdmCollectionType edmCollectionType = (IEdmCollectionType)edmType;
                         IEdmTypeReference elementTypeReference = edmCollectionType.ElementType;
                         IEdmPrimitiveType primitiveElementType = elementTypeReference.Definition as IEdmPrimitiveType;
@@ -3234,10 +3241,10 @@ public sealed class ODataClientCSharpTemplate : ODataClientTemplate
     internal override string GeometryMultiPolygonTypeName { get { return "global::Microsoft.Spatial.GeometryMultiPolygon"; } }
     internal override string GeometryMultiLineStringTypeName { get { return "global::Microsoft.Spatial.GeometryMultiLineString"; } }
     internal override string GeometryMultiPointTypeName { get { return "global::Microsoft.Spatial.GeometryMultiPoint"; } }
-    internal override string DateTypeName { get { return "global::Microsoft.OData.Edm.Library.Date"; } }
+    internal override string DateTypeName { get { return "global::Microsoft.OData.Edm.Date"; } }
     internal override string DateTimeOffsetTypeName { get { return "global::System.DateTimeOffset"; } }
     internal override string DurationTypeName { get { return "global::System.TimeSpan"; } }
-    internal override string TimeOfDayTypeName { get { return "global::Microsoft.OData.Edm.Library.TimeOfDay"; } }
+    internal override string TimeOfDayTypeName { get { return "global::Microsoft.OData.Edm.TimeOfDay"; } }
     internal override string XmlConvertClassName { get { return "global::System.Xml.XmlConvert"; } }
     internal override string EnumTypeName { get { return "global::System.Enum"; } }
     internal override string FixPattern { get { return "@{0}"; } }
@@ -5186,10 +5193,10 @@ public sealed class ODataClientVBTemplate : ODataClientTemplate
     internal override string GeometryMultiPolygonTypeName { get { return "Global.Microsoft.Spatial.GeometryMultiPolygon"; } }
     internal override string GeometryMultiLineStringTypeName { get { return "Global.Microsoft.Spatial.GeometryMultiLineString"; } }
     internal override string GeometryMultiPointTypeName { get { return "Global.Microsoft.Spatial.GeometryMultiPoint"; } }
-    internal override string DateTypeName { get { return "Global.Microsoft.OData.Edm.Library.Date"; } }
+    internal override string DateTypeName { get { return "Global.Microsoft.OData.Edm.Date"; } }
     internal override string DateTimeOffsetTypeName { get { return "Global.System.DateTimeOffset"; } }
     internal override string DurationTypeName { get { return "Global.System.TimeSpan"; } }
-    internal override string TimeOfDayTypeName { get { return "Global.Microsoft.OData.Edm.Library.TimeOfDay"; } }
+    internal override string TimeOfDayTypeName { get { return "Global.Microsoft.OData.Edm.TimeOfDay"; } }
     internal override string XmlConvertClassName { get { return "Global.System.Xml.XmlConvert"; } }
     internal override string EnumTypeName { get { return "Global.System.Enum"; } }
     internal override string FixPattern { get { return "[{0}]"; } }
