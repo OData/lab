@@ -100,12 +100,13 @@ namespace Microsoft.OData.TestService
         /// <summary>
         /// There are no comments for ReminderView in the schema.
         /// </summary>
-        public global::Microsoft.OData.Client.DataServiceQuery<global::Microsoft.OData.TestService.Person> ReminderView(string StartDateTime, string EndDateTime)
+        public global::Microsoft.OData.Client.DataServiceQuery<global::Microsoft.OData.TestService.Person> ReminderView(string StartDateTime, string EndDateTime, global::System.Nullable<int> MaxCount)
         {
             global::System.Uri requestUri;
             Context.TryGetUri(this, out requestUri);
             return this.Context.CreateFunctionQuery<global::Microsoft.OData.TestService.Person>(string.Join("/", global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.Skip(requestUri.Segments, this.Context.BaseUri.Segments.Length), s => s.Trim('/'))), "Microsoft.OData.TestService.ReminderView", false, new global::Microsoft.OData.Client.UriOperationParameter("StartDateTime", StartDateTime),
-                    new global::Microsoft.OData.Client.UriOperationParameter("EndDateTime", EndDateTime));
+                    new global::Microsoft.OData.Client.UriOperationParameter("EndDateTime", EndDateTime),
+                    new global::Microsoft.OData.Client.UriOperationParameter("MaxCount", MaxCount));
         }
     }
     /// <summary>
@@ -238,7 +239,7 @@ namespace Microsoft.OData.TestService
         /// <summary>
         /// There are no comments for ReminderView in the schema.
         /// </summary>
-        public static global::Microsoft.OData.Client.DataServiceQuery<global::Microsoft.OData.TestService.Person> ReminderView(this global::Microsoft.OData.Client.DataServiceQuerySingle<global::Microsoft.OData.TestService.Person> source, string StartDateTime, string EndDateTime)
+        public static global::Microsoft.OData.Client.DataServiceQuery<global::Microsoft.OData.TestService.Person> ReminderView(this global::Microsoft.OData.Client.DataServiceQuerySingle<global::Microsoft.OData.TestService.Person> source, string StartDateTime, string EndDateTime, global::System.Nullable<int> MaxCount)
         {
             if (!source.IsComposable)
             {
@@ -246,7 +247,8 @@ namespace Microsoft.OData.TestService
             }
 
             return source.CreateFunctionQuery<global::Microsoft.OData.TestService.Person>("Microsoft.OData.TestService.ReminderView", false, new global::Microsoft.OData.Client.UriOperationParameter("StartDateTime", StartDateTime),
-                    new global::Microsoft.OData.Client.UriOperationParameter("EndDateTime", EndDateTime));
+                    new global::Microsoft.OData.Client.UriOperationParameter("EndDateTime", EndDateTime),
+                    new global::Microsoft.OData.Client.UriOperationParameter("MaxCount", MaxCount));
         }
     }
 }

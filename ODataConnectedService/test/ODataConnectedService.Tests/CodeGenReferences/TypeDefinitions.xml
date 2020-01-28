@@ -16,11 +16,13 @@
         <Property Name="Id" Type="Edm.Int32"/>
         <Property Name="ReminderTime" Type="Microsoft.OData.TestService.DateTime"/>
       </EntityType>
-      <TypeDefinition Name="DateTime" UnderlyingType="Edm.String" />
+      <TypeDefinition Name="DateTime" UnderlyingType="Edm.String"/>
+      <TypeDefinition Name="ItemCount" UnderlyingType="Edm.Int32"/>
       <Function Name="ReminderView" IsBound="true">
         <Parameter Name="bindingparameter" Type="Microsoft.OData.TestService.Person"/>
         <Parameter Name="StartDateTime" Type="Microsoft.OData.TestService.DateTime" Nullable="false"/>
         <Parameter Name="EndDateTime" Type="Microsoft.OData.TestService.DateTime"/>
+        <Parameter Name="MaxCount" Type="Microsoft.OData.TestService.ItemCount" Nullable="true"/>
         <ReturnType Type="Collection(Microsoft.OData.TestService.Person)" Nullable="false"/>
       </Function>
     </Schema>
