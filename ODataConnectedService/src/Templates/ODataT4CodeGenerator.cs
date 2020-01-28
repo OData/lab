@@ -1299,15 +1299,13 @@ public abstract class ODataClientTemplate : TemplateBase
         Dictionary<IEdmStructuredType, List<IEdmStructuredType>> structuredBaseTypeMap = new Dictionary<IEdmStructuredType, List<IEdmStructuredType>>();
         foreach(IEdmSchemaType type in schemaElements.OfType<IEdmSchemaType>())
         {
-            IEdmEnumType enumType = type as IEdmEnumType;
-            if (enumType != null)
+            if (type is IEdmEnumType enumType)
             {
                 this.WriteEnumType(enumType);
             }
             else
             {
-                IEdmComplexType complexType = type as IEdmComplexType;
-                if (complexType != null)
+                if (type is IEdmComplexType complexType)
                 {
                     this.WriteComplexType(complexType, boundOperationsMap);
                 }
@@ -2806,84 +2804,77 @@ internal static class Utils
     /// <returns>The clr type name of the type reference.</returns>
     internal static string GetClrTypeName(IEdmTypeReference edmTypeReference, bool useDataServiceCollection, ODataClientTemplate clientTemplate, CodeGenerationContext context, bool addNullableTemplate = true, bool needGlobalPrefix = true, bool isOperationParameter = false)
     {
-        string clrTypeName;
         IEdmType edmType = edmTypeReference.Definition;
-        IEdmPrimitiveType edmPrimitiveType = edmType as IEdmPrimitiveType;
-        if (edmPrimitiveType != null)
+        if (edmType is IEdmPrimitiveType edmPrimitiveType)
         {
-            clrTypeName = Utils.GetClrTypeName(edmPrimitiveType, clientTemplate);
+            var clrTypeName = Utils.GetClrTypeName(edmPrimitiveType, clientTemplate);
             if (edmTypeReference.IsNullable && !clientTemplate.ClrReferenceTypes.Contains(edmPrimitiveType.PrimitiveKind) && addNullableTemplate)
             {
-                clrTypeName = string.Format(CultureInfo.InvariantCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
+                clrTypeName = GetNullableClrTypeName(clrTypeName, clientTemplate);
             }
+            return clrTypeName;
         }
-        else
+        if (edmType is IEdmComplexType edmComplexType)
         {
-            IEdmComplexType edmComplexType = edmType as IEdmComplexType;
-            if (edmComplexType != null)
-            {
-                clrTypeName = context.GetPrefixedFullName(edmComplexType,
+            var clrTypeName = context.GetPrefixedFullName(edmComplexType,
                     context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmComplexType.Name)) : clientTemplate.GetFixedName(edmComplexType.Name), clientTemplate);
+            return clrTypeName;
+        }
+        if (edmType is IEdmEnumType edmEnumType)
+        {
+            var clrTypeName = context.GetPrefixedFullName(edmEnumType,
+                context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmEnumType.Name)) : clientTemplate.GetFixedName(edmEnumType.Name), clientTemplate, needGlobalPrefix);
+            if (edmTypeReference.IsNullable && addNullableTemplate)
+            {
+                clrTypeName = GetNullableClrTypeName(clrTypeName, clientTemplate);
+            }
+            return clrTypeName;
+        }
+        if (edmType is IEdmEntityType edmEntityType)
+        {
+            var clrTypeName = context.GetPrefixedFullName(edmEntityType,
+                context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmEntityType.Name)) : clientTemplate.GetFixedName(edmEntityType.Name), clientTemplate);
+            return clrTypeName;
+        }
+        if (edmType is IEdmTypeDefinition edmTypeDefinition)
+        {
+            var underlyingType = edmTypeDefinition.UnderlyingType;
+            var clrTypeName = Utils.GetClrTypeName(underlyingType, clientTemplate);
+            if (edmTypeReference.IsNullable && !clientTemplate.ClrReferenceTypes.Contains(underlyingType.PrimitiveKind) && addNullableTemplate)
+            {
+                clrTypeName = GetNullableClrTypeName(clrTypeName, clientTemplate);
+            }
+            return clrTypeName;
+        }
+        if (edmType is IEdmCollectionType edmCollectionType)
+        {
+            string clrTypeName = null;
+            IEdmTypeReference elementTypeReference = edmCollectionType.ElementType;
+            IEdmPrimitiveType primitiveElementType = elementTypeReference.Definition as IEdmPrimitiveType;
+            if (primitiveElementType != null)
+            {
+                clrTypeName = Utils.GetClrTypeName(primitiveElementType, clientTemplate);
             }
             else
             {
-                IEdmEnumType edmEnumType = edmType as IEdmEnumType;
-                if (edmEnumType != null)
-                {
-                    clrTypeName = context.GetPrefixedFullName(edmEnumType,
-                        context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmEnumType.Name)) : clientTemplate.GetFixedName(edmEnumType.Name), clientTemplate, needGlobalPrefix);
-                    if (edmTypeReference.IsNullable && addNullableTemplate)
-                    {
-                        clrTypeName = string.Format(CultureInfo.InvariantCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
-                    }
-                }
-                else 
-                {
-                    IEdmEntityType edmEntityType = edmType as IEdmEntityType;
-                    if (edmEntityType != null)
-                    {
-                        clrTypeName = context.GetPrefixedFullName(edmEntityType,
-                            context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(edmEntityType.Name)) : clientTemplate.GetFixedName(edmEntityType.Name), clientTemplate);
-                    }
-                    else if (edmType is IEdmTypeDefinition edmTypeDefinition)
-                    {
-                        IEdmPrimitiveType underlyingType = edmTypeDefinition.UnderlyingType;
-                        clrTypeName = Utils.GetClrTypeName(underlyingType, clientTemplate);
-                        if (edmTypeReference.IsNullable && !clientTemplate.ClrReferenceTypes.Contains(underlyingType.PrimitiveKind) && addNullableTemplate)
-                        {
-                            clrTypeName = string.Format(CultureInfo.InvariantCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
-                        }
-                    }
-                    else {
-                        IEdmCollectionType edmCollectionType = (IEdmCollectionType)edmType;
-                        IEdmTypeReference elementTypeReference = edmCollectionType.ElementType;
-                        IEdmPrimitiveType primitiveElementType = elementTypeReference.Definition as IEdmPrimitiveType;
-                        if (primitiveElementType != null)
-                        {
-                            clrTypeName = Utils.GetClrTypeName(primitiveElementType, clientTemplate);
-                        }
-                        else
-                        {
-                            IEdmSchemaElement schemaElement = (IEdmSchemaElement)elementTypeReference.Definition;
-                            clrTypeName = context.GetPrefixedFullName(schemaElement,
-                                context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(schemaElement.Name)) : clientTemplate.GetFixedName(schemaElement.Name), clientTemplate);
-                        }    
-                
-                        string collectionTypeName = isOperationParameter
-                                                        ? clientTemplate.ICollectionOfTStructureTemplate
-                                                        : (useDataServiceCollection
-                                                            ? (elementTypeReference.TypeKind() == EdmTypeKind.Entity
-                                                                ? clientTemplate.DataServiceCollectionStructureTemplate
-                                                                : clientTemplate.ObservableCollectionStructureTemplate)
-                                                            : clientTemplate.ObjectModelCollectionStructureTemplate);
+                IEdmSchemaElement schemaElement = (IEdmSchemaElement)elementTypeReference.Definition;
+                clrTypeName = context.GetPrefixedFullName(schemaElement,
+                    context.EnableNamingAlias ? clientTemplate.GetFixedName(Customization.CustomizeNaming(schemaElement.Name)) : clientTemplate.GetFixedName(schemaElement.Name), clientTemplate);
+            }    
+    
+            string collectionTypeName = isOperationParameter
+                                            ? clientTemplate.ICollectionOfTStructureTemplate
+                                            : (useDataServiceCollection
+                                                ? (elementTypeReference.TypeKind() == EdmTypeKind.Entity
+                                                    ? clientTemplate.DataServiceCollectionStructureTemplate
+                                                    : clientTemplate.ObservableCollectionStructureTemplate)
+                                                : clientTemplate.ObjectModelCollectionStructureTemplate);
 
-                        clrTypeName = string.Format(CultureInfo.InvariantCulture, collectionTypeName, clrTypeName);
-                    }
-                }
-            }
+            clrTypeName = string.Format(CultureInfo.InvariantCulture, collectionTypeName, clrTypeName);
+            return clrTypeName;
         }
 
-        return clrTypeName;
+        throw new Exception($"Could not get CLR type name for EDM type '{edmTypeReference.FullName()}'");
     }
 
     /// <summary>
@@ -3024,6 +3015,17 @@ internal static class Utils
             string clrTypeName = GetClrTypeName(edmTypeReference, useDataServiceCollection, clientTemplate, context);
             return clientTemplate.NewModifier + clrTypeName + constructorParameters;
         }
+    }
+
+    /// <summary>
+    /// Gets the corresponding nullable type name for the given clr type
+    /// </summary>
+    /// <param name="clrTypeName">Original CLR type name.</param>
+    /// <param name="clientTemplate">ODataClientTemplate instance that call this method.</param>
+    /// <returns>The nullable version of the specified type name.</returns>
+    internal static string GetNullableClrTypeName(string clrTypeName, ODataClientTemplate clientTemplate)
+    {
+        return string.Format(CultureInfo.InvariantCulture, clientTemplate.SystemNullableStructureTemplate, clrTypeName);
     }
         
     /// <summary>
