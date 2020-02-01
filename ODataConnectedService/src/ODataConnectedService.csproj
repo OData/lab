@@ -98,7 +98,9 @@
     <Reference Include="Microsoft.Spatial, Version=6.17.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Spatial.6.17.0\lib\portable-net45+win+wpa81\Microsoft.Spatial.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.ComponentModelHost, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.ComponentModelHost.15.7.27703\lib\net45\Microsoft.VisualStudio.ComponentModelHost.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.ConnectedServices, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.ConnectedServices.2.0.0\lib\net45\Microsoft.VisualStudio.ConnectedServices.dll</HintPath>
       <Private>False</Private>
