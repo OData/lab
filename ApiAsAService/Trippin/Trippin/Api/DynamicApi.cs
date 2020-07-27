@@ -10,7 +10,6 @@ using Microsoft.AspNet.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Vocabularies;
-using Microsoft.OData.Service.ApiAsAService.Models;
 using Microsoft.OData.Service.ApiAsAService.Submit;
 using Microsoft.Restier.Core;
 using Microsoft.Restier.Core.Model;
@@ -35,7 +34,7 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
             };
 
             IServiceCollection serviceCollection = ApiBase.ConfigureApi(apiType, services)
-                .AddSingleton<ODataPayloadValueConverter, CustomizedPayloadValueConverter>()
+//                .AddSingleton<ODataPayloadValueConverter, CustomizedPayloadValueConverter>()
                 .AddSingleton<ODataValidationSettings>(validationSettingFactory)
                 .AddService<IChangeSetItemFilter, CustomizedSubmitProcessor>()
                 .AddSingleton<IModelBuilder, DynamicModelBuilder>()
@@ -70,7 +69,7 @@ namespace Microsoft.OData.Service.ApiAsAService.Api
 
         public async Task<IEdmModel> GetModelAsync(ModelContext context, CancellationToken cancellationToken)
         {
-            return GetModel();
+            return await Task.FromResult(GetModel());
         }
 
     }

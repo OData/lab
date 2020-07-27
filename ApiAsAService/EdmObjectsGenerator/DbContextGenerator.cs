@@ -125,30 +125,29 @@
             //generate the DbContext type
             var entitiesBuilder = moduleBuilder.DefineType(dbContextName, TypeAttributes.Class | TypeAttributes.Public, typeof(DbContext));
             var dbContextType = typeof(DbContext);
-            entitiesBuilder.CreatePassThroughConstructors(dbContextType);
+            entitiesBuilder.CreateDefaultConstructor(dbContextType, "name=" + dbContextName);
 
-
-            foreach (var typeBuilderInfo in _typeBuildersDict)
+            foreach (var entitySet in model.EntityContainer.EntitySets())
             {
-                if (!typeBuilderInfo.Value.IsStructured)
+                TypeBuilderInfo entityType = _typeBuildersDict.FirstOrDefault(t => t.Key == entitySet.EntityType().FullName()).Value;
+                if (entityType != null)
                 {
                     Type listOf = typeof(DbSet<>);
-                    Type selfContained = listOf.MakeGenericType(typeBuilderInfo.Value.Builder);
-                    PropertyBuilderHelper.BuildProperty(entitiesBuilder, typeBuilderInfo.Value.Builder.Name, selfContained);
+                    Type selfContained = listOf.MakeGenericType(entityType.Builder);
+                    PropertyBuilderHelper.BuildProperty(entitiesBuilder, entitySet.Name, selfContained);
                 }
             }
 
-           
-            // create the Main(string[] args) method
+            // create the OnModelCreating method
             MethodBuilder methodbuilder = entitiesBuilder.DefineMethod("OnModelCreating", MethodAttributes.Public
                                                                                           | MethodAttributes.HideBySig
                                                                                           | MethodAttributes.CheckAccessOnOverride
                                                                                           | MethodAttributes.Virtual,
                                                                                           typeof(void), new Type[] { typeof(DbModelBuilder) });
 
-            // generate the IL for the Main method
+            // generate the IL for the OnModelCreating method
             ILGenerator ilGenerator = methodbuilder.GetILGenerator();
-            ilGenerator.ThrowException(typeof(UnintentionalCodeFirstException));
+//todo: insert code
             ilGenerator.Emit(OpCodes.Ret);
             entitiesBuilder.CreateType();
         }
@@ -165,7 +164,6 @@
                 if (!_typeBuildersDict.ContainsKey(moduleName))
                 {
                     previouslyBuiltType = CreateType(targetType.BaseType, moduleBuilder, targetType.BaseType.FullTypeName());
-
                 }
 
                 var typeBuilder = moduleBuilder.DefineType(moduleName, TypeAttributes.Class | TypeAttributes.Public, previouslyBuiltType);
@@ -189,10 +187,22 @@
         internal static void Compile(IEdmStructuredType type, ModuleBuilder moduleBuilder, string moduleName, bool navPass = false)
         {
             TypeBuilder typeBuilder = null;
+
+            int iKey = 0;
+            int keyCount = 0;
+            IEdmEntityType entityType = type as IEdmEntityType;
+            if (entityType != null)
+            {
+                IEnumerable<IEdmStructuralProperty> keyProperties = entityType.DeclaredKey;
+                if (keyProperties != null)
+                {
+                    keyCount = keyProperties.Count();
+                }
+            }
+
             if (type.BaseType != null && !navPass)
             {
                 typeBuilder = CreateType(type, moduleBuilder, moduleName);
-
             }
 
             if (!navPass)
@@ -206,7 +216,7 @@
                 {
                     if (property.PropertyKind != EdmPropertyKind.Navigation)
                     {
-                        GenerateProperty(property, typeBuilder, moduleBuilder);
+                        GenerateProperty(property, typeBuilder, moduleBuilder, property.IsKey() ? keyCount == 1 ? -1 : iKey++ : (int?)null);
                     }
                 }
             }
@@ -244,10 +254,9 @@
             }
         }
 
-        internal static void GenerateProperty(IEdmProperty property, TypeBuilder typeBuilder, ModuleBuilder moduleBuilder)
+        internal static void GenerateProperty(IEdmProperty property, TypeBuilder typeBuilder, ModuleBuilder moduleBuilder, int? keyIndex = null)
         {
             var propertyName = property.Name;
-
             var emdPropType = property.Type.PrimitiveKind();
             var propertyType = GetPrimitiveClrType(emdPropType, false);
             if (propertyType == null)
@@ -293,13 +302,14 @@
                 }
             }
 
-            if (property.Type.IsNullable && Nullable.GetUnderlyingType(propertyType) != null)
+            if (property.Type.IsNullable && propertyType.IsValueType)
             {
                 Type nullableOf = typeof(Nullable<>);
                 Type selfContained = nullableOf.MakeGenericType(propertyType);
                 propertyType = selfContained;
             }
-            PropertyBuilderHelper.BuildProperty(typeBuilder, propertyName, propertyType);
+
+            PropertyBuilderHelper.BuildProperty(typeBuilder, propertyName, propertyType, keyIndex);
         }
 
         internal static void GenerateEnum(IEdmEnumMember member, EnumBuilder enumBuilder, ModuleBuilder moduleBuilder)
@@ -411,7 +421,7 @@
         static void Main(string[] args)
         {
             //TODO: grab edm path and assembly name from cmdline args
-            string csdlFile = @"C:\repos\fun\lab\ApiAsAService\Trippin.xml";
+            string csdlFile = @"Trippin.xml";
 
             DbContextGenerator generator = new DbContextGenerator();
             generator.GenerateDbContext(csdlFile);

@@ -79,7 +79,6 @@
       </EntityType>
       <EntityContainer Name="DemoService">
         <EntitySet Name="Products" EntityType="ODataDemo.Product">
-          <NavigationPropertyBinding Path="ODataDemo.FeaturedProduct/Advertisement" Target="Advertisements" />
           <NavigationPropertyBinding Path="Categories" Target="Categories" />
           <NavigationPropertyBinding Path="Supplier" Target="Suppliers" />
           <NavigationPropertyBinding Path="ProductDetail" Target="ProductDetails" />
@@ -98,9 +97,6 @@
         </EntitySet>
         <EntitySet Name="PersonDetails" EntityType="ODataDemo.PersonDetail">
           <NavigationPropertyBinding Path="Person" Target="Persons" />
-        </EntitySet>
-        <EntitySet Name="Advertisements" EntityType="ODataDemo.Advertisement">
-          <NavigationPropertyBinding Path="FeaturedProduct" Target="Products" />
         </EntitySet>
       </EntityContainer>
       <Annotations Target="ODataDemo.DemoService">

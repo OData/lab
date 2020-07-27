@@ -8,6 +8,7 @@
 
     public static class TypeBuilderHelper
     {
+        /*
         /// <summary>Creates one constructor for each public constructor in the base class. Each constructor simply
         /// forwards its arguments to the base constructor, and matches the base constructor's signature.
         /// Supports optional values, and custom attributes on constructors and parameters.
@@ -62,7 +63,23 @@
                 emitter.Emit(OpCodes.Ret);
             }
         }
+        */
 
+        public static void CreateDefaultConstructor(this TypeBuilder builder, Type baseType, string paramValue)
+        {
+            var constructor = baseType.GetConstructor(new Type[] { typeof(string) });
+            var ctor = builder.DefineConstructor(MethodAttributes.Public, constructor.CallingConvention, new Type[] { });
+
+            var emitter = ctor.GetILGenerator();
+            emitter.Emit(OpCodes.Nop);
+
+            // Load `this` and call base constructor with arguments
+            emitter.Emit(OpCodes.Ldarg_0);
+            emitter.Emit(OpCodes.Ldstr, paramValue);
+            emitter.Emit(OpCodes.Call, constructor);
+
+            emitter.Emit(OpCodes.Ret);
+        }
 
         private static CustomAttributeBuilder[] BuildCustomAttributes(IEnumerable<CustomAttributeData> customAttributes)
         {

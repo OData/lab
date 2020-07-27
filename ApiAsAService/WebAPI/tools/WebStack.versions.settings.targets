@@ -22,10 +22,20 @@
     Revision number is a date code. Note that this only work for 6 years before the year part (year minus 2017)
     overflows the Int16. The system convert below will throw errors when this happens.
   -->
+  <!--
   <PropertyGroup>
-    <VersionStartYear Condition="'$(VersionStartYear)' == ''">2017</VersionStartYear>
+    <VersionStartYear Condition="'$(VersionStartYear)' == ''">2020</VersionStartYear>
     <VersionDateCode>$([System.Convert]::ToInt16('$([MSBuild]::Add(1, $([MSBuild]::Subtract($([System.DateTime]::Now.Year), $(VersionStartYear)))))$([System.DateTime]::Now.ToString("MMdd"))'))</VersionDateCode>
     <VersionRevision Condition="'$(VersionRevision)' == '' OR '$(VersionRevision)' == '0'">$([System.Convert]::ToString($(VersionDateCode)))</VersionRevision>
+  </PropertyGroup>-->
+
+  <!--
+    Fix version error
+  -->
+  <PropertyGroup>
+    <VersionStartYear>2020</VersionStartYear>
+    <VersionDateCode>1</VersionDateCode>
+    <VersionRevision>1</VersionRevision>
   </PropertyGroup>
 
     <!-- Product Version -->
@@ -111,7 +121,7 @@
   </Target>
 
   <Target Name="ValidateVersionValues">
-    <!-- Throw if any of the version values is not int16 -->
+     <!--Throw if any of the version values is not int16--> 
     <PropertyGroup>
       <VersionMajor>$([System.Convert]::ToInt16('$(VersionMajor)'))</VersionMajor>
       <VersionMinor>$([System.Convert]::ToInt16('$(VersionMinor)'))</VersionMinor>

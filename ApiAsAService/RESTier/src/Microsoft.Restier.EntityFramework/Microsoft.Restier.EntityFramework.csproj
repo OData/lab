@@ -10,11 +10,11 @@
     </Description>
     <PackageTags>$(PackageTags)entityframework;entityframework6</PackageTags>
 
-    <TargetFrameworks>net462;net472</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
   </PropertyGroup>
   
   <PropertyGroup>
-    <TargetFrameworks>net462;net472</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

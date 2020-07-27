@@ -53,25 +53,25 @@ namespace Microsoft.OData.Service.ApiAsAService
                         string dataSourceName = segments[0];
                         
                         IServiceProvider serviceProvider = request.CreateRequestContainer(this.RouteName);
-
-                        //Type dynamicType;
-                        //switch (dataSourceName)
-                        //{
-                        //    case "Trippin":
-                        //        dynamicType = typeof(Models.TrippinModel);
-                        //        break;
-                        //    case "NWind":
-                        //        dynamicType = typeof(ODataDemo.NWModel);
-                        //        break;
-                        //    default:
-                        //        throw new Exception("Service not found"); //return request.CreateErrorResponse(HttpStatusCode.NotFound, String.Format("Service {0} not found.", dataSourceName));
-                        //}
-
+#if  false
+                        Type dynamicType;
+                        switch (dataSourceName)
+                        {
+                            case "Trippin":
+                                dynamicType = typeof(Models.TrippinModel);
+                                break;
+                            case "NWind":
+                                dynamicType = typeof(ODataDemo.NWModel);
+                                break;
+                            default:
+                                throw new Exception("Service not found"); //return request.CreateErrorResponse(HttpStatusCode.NotFound, String.Format("Service {0} not found.", dataSourceName));
+                        }
+#else
                         var appData = System.Web.HttpContext.Current.Server.MapPath("~/App_Data");
                         var file = System.IO.Path.Combine(appData, dataSourceName + ".xml");
 
                         Type dynamicType = DynamicHelper.GetDynamicDbContext(file);
-
+#endif
                         ApiFactory factory = serviceProvider.GetRequiredService<ApiFactory>();
                         factory.ModelType = dynamicType;
 
