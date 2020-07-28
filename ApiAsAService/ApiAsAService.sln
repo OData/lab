@@ -22,8 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{DB42E0B8-C0C7-4DE4-9437-2B2A229B5F8F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RESTier", "RESTier", "{76B4E51F-233E-4DD3-AABF-A6F47788040D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.AspNet.OData", "WebAPI\src\Microsoft.AspNet.OData\Microsoft.AspNet.OData.csproj", "{A6F9775D-F7E2-424E-8363-79644A73038F}"

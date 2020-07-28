@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Web.Http.Routing;
 using Microsoft.AspNet.OData.Extensions;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Service.ApiAsAService.Api;
 using Microsoft.Restier.AspNet;
-using Microsoft.Restier.Core;
 using Microsoft.Restier.Core.Model;
 
 namespace Microsoft.OData.Service.ApiAsAService
@@ -53,25 +51,11 @@ namespace Microsoft.OData.Service.ApiAsAService
                         string dataSourceName = segments[0];
                         
                         IServiceProvider serviceProvider = request.CreateRequestContainer(this.RouteName);
-#if  false
-                        Type dynamicType;
-                        switch (dataSourceName)
-                        {
-                            case "Trippin":
-                                dynamicType = typeof(Models.TrippinModel);
-                                break;
-                            case "NWind":
-                                dynamicType = typeof(ODataDemo.NWModel);
-                                break;
-                            default:
-                                throw new Exception("Service not found"); //return request.CreateErrorResponse(HttpStatusCode.NotFound, String.Format("Service {0} not found.", dataSourceName));
-                        }
-#else
                         var appData = System.Web.HttpContext.Current.Server.MapPath("~/App_Data");
                         var file = System.IO.Path.Combine(appData, dataSourceName + ".xml");
 
                         Type dynamicType = DynamicHelper.GetDynamicDbContext(file);
-#endif
+
                         ApiFactory factory = serviceProvider.GetRequiredService<ApiFactory>();
                         factory.ModelType = dynamicType;
 

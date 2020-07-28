@@ -4,7 +4,6 @@ using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNet.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData.Service.ApiAsAService.Api;
 using Microsoft.Restier.AspNet;
 using Microsoft.Restier.AspNet.Batch;
 using Microsoft.Restier.Core;
@@ -25,51 +24,17 @@ namespace Microsoft.OData.Service.ApiAsAService
 {
     public static class DynamicHelper
     {
-        private const string MapRestierRouteMethod = "MapRestierRoute";
-        //        private const string RestierAssembly = "Microsoft.Restier.AspNet";
-        private const string httpConfigurationExtensionsType = "System.Web.Http.HttpConfigurationExtensions";
-        //        private const string ApiAsAServiceAssembly = "Microsoft.OData.Service.ApiAsAService";
+        //private const string MapRestierRouteMethod = "MapRestierRoute";
+        //private const string httpConfigurationExtensionsType = "System.Web.Http.HttpConfigurationExtensions";
         private const string DynamicApiType = "Microsoft.OData.Service.ApiAsAService.Api.DynamicApi`1";
         private const string DynamicHelperType = "Microsoft.OData.Service.ApiAsAService.DynamicHelper";
-        private static Type dynamicApiType = Assembly.GetExecutingAssembly().GetType(DynamicApiType);
-        private static Type dynamicHelperType = Assembly.GetExecutingAssembly().GetType(DynamicHelperType);
+        //private static Type dynamicApiType = Assembly.GetExecutingAssembly().GetType(DynamicApiType);
+        //private static Type dynamicHelperType = Assembly.GetExecutingAssembly().GetType(DynamicHelperType);
 
-        //public static Task<ODataRoute> MapDynamicRoute(Type tApi, HttpConfiguration config, string routeName,
-        //    string routePrefix, RestierBatchHandler batchHandler)
+        //public static ApiBase CreateEntifyFrameworkApi(Type tApi, IServiceProvider serviceProvider)
         //{
-        //Type restierType = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == RestierAssembly).GetType(httpConfigurationExtensionsType);
-        //Type dynamicType = dynamicApiType.MakeGenericType(tApi);
-        //    MethodInfo method = restierType.GetMethod(
-        //         MapRestierRouteMethod,
-        //         BindingFlags.Static | BindingFlags.Public,
-        //         null,
-        //         new[] { typeof(HttpConfiguration), typeof(string), typeof(string), typeof(RestierBatchHandler) },
-        //         null);
-        //    return (Task<ODataRoute>)method.MakeGenericMethod(dynamicType).Invoke(null, new object[] { config, routeName, routePrefix, batchHandler });
+        //    return (ApiBase)typeof(EntityFrameworkApi<>).MakeGenericType(tApi).GetConstructor(new Type[] { typeof(IServiceProvider) }).Invoke(new object[] { serviceProvider });
         //}
-
-        //public static Task<ODataRoute> MapDynamicRoute(Type tApi, HttpConfiguration config, string routeName,
-        //    string routePrefix, RestierBatchHandler batchHandler)
-        //{
-        //    Type dynamicType = dynamicApiType.MakeGenericType(tApi);
-        //    MethodInfo method = dynamicHelperType.GetMethod(
-        //         MapRestierRouteMethod,
-        //         BindingFlags.Static | BindingFlags.Public,
-        //         null,
-        //         new[] { typeof(HttpConfiguration), typeof(string), typeof(string), typeof(RestierBatchHandler) },
-        //         null);
-        //    return (Task<ODataRoute>)method.MakeGenericMethod(dynamicType).Invoke(null, new object[] { config, routeName, routePrefix, batchHandler });
-        //}
-
-        //public static ApiBase CreateDynamicApi(Type tApi, IServiceProvider serviceProvider)
-        //{
-        //   return (ApiBase)dynamicApiType.MakeGenericType(tApi).GetConstructor(new Type[] { typeof(IServiceProvider) }).Invoke(new object[] { serviceProvider });
-        //}
-
-        public static ApiBase CreateEntifyFrameworkApi(Type tApi, IServiceProvider serviceProvider)
-        {
-            return (ApiBase)typeof(EntityFrameworkApi<>).MakeGenericType(tApi).GetConstructor(new Type[] { typeof(IServiceProvider) }).Invoke(new object[] { serviceProvider });
-        }
 
         /// <summary>
         /// Maps the API routes to the RestierController.

@@ -46,7 +46,7 @@
     <Content Include="App_Data\NWind.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\NW_Simple.xml">
+    <Content Include="App_Data\NWSimple.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Global.asax" />

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
   <edmx:DataServices>
-    <Schema Namespace="Microsoft.OData.Service.ApiAsAService.Models" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+    <Schema Namespace="Trippin" xmlns="http://docs.oasis-open.org/odata/ns/edm">
       <EntityType Name="Airline">
         <Key>
           <PropertyRef Name="AirlineCode" />
@@ -23,7 +23,7 @@
           <PropertyRef Name="Id" />
         </Key>
         <Property Name="Id" Type="Edm.Int32" Nullable="false" />
-        <Property Name="OccursAt" Type="Microsoft.OData.Service.ApiAsAService.Models.Location" />
+        <Property Name="OccursAt" Type="Trippin.Location" />
         <Property Name="Description" Type="Edm.String" />
       </EntityType>
       <EntityType Name="Flight">
@@ -40,13 +40,13 @@
         <Property Name="FromId" Type="Edm.String" />
         <Property Name="ToId" Type="Edm.String" />
         <Property Name="AirlineId" Type="Edm.String" />
-        <NavigationProperty Name="From" Type="Microsoft.OData.Service.ApiAsAService.Models.Airport">
+        <NavigationProperty Name="From" Type="Trippin.Airport">
           <ReferentialConstraint Property="FromId" ReferencedProperty="IcaoCode" />
         </NavigationProperty>
-        <NavigationProperty Name="To" Type="Microsoft.OData.Service.ApiAsAService.Models.Airport">
+        <NavigationProperty Name="To" Type="Trippin.Airport">
           <ReferentialConstraint Property="ToId" ReferencedProperty="IcaoCode" />
         </NavigationProperty>
-        <NavigationProperty Name="Airline" Type="Microsoft.OData.Service.ApiAsAService.Models.Airline">
+        <NavigationProperty Name="Airline" Type="Trippin.Airline">
           <ReferentialConstraint Property="AirlineId" ReferencedProperty="AirlineCode" />
         </NavigationProperty>
       </EntityType>
@@ -76,13 +76,13 @@
         <Property Name="BirthTime2" Type="Edm.TimeOfDay" />
         <Property Name="BirthDateTime" Type="Edm.DateTimeOffset" Nullable="false" />
         <Property Name="BirthDateTime2" Type="Edm.DateTimeOffset" />
-        <Property Name="FavoriteFeature" Type="Microsoft.OData.Service.ApiAsAService.Models.Feature" Nullable="false" />
-        <Property Name="FavoriteFeature2" Type="Microsoft.OData.Service.ApiAsAService.Models.Feature" />
-        <NavigationProperty Name="BestFriend" Type="Microsoft.OData.Service.ApiAsAService.Models.Person">
+        <Property Name="FavoriteFeature" Type="Trippin.Feature" Nullable="false" />
+        <Property Name="FavoriteFeature2" Type="Trippin.Feature" />
+        <NavigationProperty Name="BestFriend" Type="Trippin.Person">
           <ReferentialConstraint Property="PersonId" ReferencedProperty="PersonId" />
         </NavigationProperty>
-        <NavigationProperty Name="Friends" Type="Collection(Microsoft.OData.Service.ApiAsAService.Models.Person)" />
-        <NavigationProperty Name="Trips" Type="Collection(Microsoft.OData.Service.ApiAsAService.Models.Trip)" />
+        <NavigationProperty Name="Friends" Type="Collection(Trippin.Person)" />
+        <NavigationProperty Name="Trips" Type="Collection(Trippin.Trip)" />
       </EntityType>
       <EntityType Name="Trip">
         <Key>
@@ -98,22 +98,22 @@
         <Property Name="StartsAt" Type="Edm.DateTimeOffset" Nullable="false" />
         <Property Name="EndsAt" Type="Edm.DateTimeOffset" Nullable="false" />
         <Property Name="LastUpdated" Type="Edm.DateTimeOffset" Nullable="false" />
-        <NavigationProperty Name="Flights" Type="Collection(Microsoft.OData.Service.ApiAsAService.Models.Flight)" />
-        <NavigationProperty Name="Events" Type="Collection(Microsoft.OData.Service.ApiAsAService.Models.Event)" />
+        <NavigationProperty Name="Flights" Type="Collection(Trippin.Flight)" />
+        <NavigationProperty Name="Events" Type="Collection(Trippin.Event)" />
       </EntityType>
       <ComplexType Name="Location">
         <Property Name="Address" Type="Edm.String" />
       </ComplexType>
-      <EntityType Name="SpecialOrder" BaseType="Microsoft.OData.Service.ApiAsAService.Models.Order">
+      <EntityType Name="SpecialOrder" BaseType="Trippin.Order">
         <Property Name="Tag" Type="Edm.String" />
       </EntityType>
-      <EntityType Name="Employee" BaseType="Microsoft.OData.Service.ApiAsAService.Models.Person">
+      <EntityType Name="Employee" BaseType="Trippin.Person">
         <Property Name="Cost" Type="Edm.Int64" Nullable="false" />
-        <NavigationProperty Name="Peers" Type="Collection(Microsoft.OData.Service.ApiAsAService.Models.Person)" />
+        <NavigationProperty Name="Peers" Type="Collection(Trippin.Person)" />
       </EntityType>
-      <EntityType Name="Manager" BaseType="Microsoft.OData.Service.ApiAsAService.Models.Person">
+      <EntityType Name="Manager" BaseType="Trippin.Person">
         <Property Name="Budget" Type="Edm.Int64" Nullable="false" />
-        <NavigationProperty Name="DirectReports" Type="Collection(Microsoft.OData.Service.ApiAsAService.Models.Person)" />
+        <NavigationProperty Name="DirectReports" Type="Collection(Trippin.Person)" />
       </EntityType>
       <EnumType Name="Feature">
         <Member Name="Feature1" Value="0" />
@@ -122,29 +122,29 @@
         <Member Name="Feature4" Value="3" />
       </EnumType>
       <EntityContainer Name="Container">
-        <EntitySet Name="Airlines" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Airline">
+        <EntitySet Name="Airlines" EntityType="Trippin.Airline">
           <Annotation Term="Org.OData.Core.V1.OptimisticConcurrency">
             <Collection>
               <PropertyPath>TimeStampValue</PropertyPath>
             </Collection>
           </Annotation>
         </EntitySet>
-        <EntitySet Name="Airports" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Airport" />
-        <EntitySet Name="Events" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Event" />
-        <EntitySet Name="Flights" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Flight">
+        <EntitySet Name="Airports" EntityType="Trippin.Airport" />
+        <EntitySet Name="Events" EntityType="Trippin.Event" />
+        <EntitySet Name="Flights" EntityType="Trippin.Flight">
           <NavigationPropertyBinding Path="Airline" Target="Airlines" />
           <NavigationPropertyBinding Path="From" Target="Airports" />
           <NavigationPropertyBinding Path="To" Target="Airports" />
         </EntitySet>
-        <EntitySet Name="Orders" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Order" />
-        <EntitySet Name="People" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Person">
+        <EntitySet Name="Orders" EntityType="Trippin.Order" />
+        <EntitySet Name="People" EntityType="Trippin.Person">
           <NavigationPropertyBinding Path="BestFriend" Target="People" />
           <NavigationPropertyBinding Path="Friends" Target="People" />
-          <NavigationPropertyBinding Path="Microsoft.OData.Service.ApiAsAService.Models.Employee/Peers" Target="People" />
-          <NavigationPropertyBinding Path="Microsoft.OData.Service.ApiAsAService.Models.Manager/DirectReports" Target="People" />
+          <NavigationPropertyBinding Path="Trippin.Employee/Peers" Target="People" />
+          <NavigationPropertyBinding Path="Trippin.Manager/DirectReports" Target="People" />
           <NavigationPropertyBinding Path="Trips" Target="Trips" />
         </EntitySet>
-        <EntitySet Name="Trips" EntityType="Microsoft.OData.Service.ApiAsAService.Models.Trip">
+        <EntitySet Name="Trips" EntityType="Trippin.Trip">
           <NavigationPropertyBinding Path="Events" Target="Events" />
           <NavigationPropertyBinding Path="Flights" Target="Flights" />
           <Annotation Term="Org.OData.Core.V1.OptimisticConcurrency">

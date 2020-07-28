@@ -3,13 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
-    using System.Data.Entity.Infrastructure;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
     using System.Text.RegularExpressions;
-    using System.Threading;
     using System.Xml;
     using Microsoft.OData.Edm;
     using Microsoft.OData.Edm.Csdl;
@@ -18,9 +16,9 @@
     [Serializable]
     public class DbContextGenerator
     {
-        static Dictionary<string, TypeBuilderInfo> _typeBuildersDict = new Dictionary<string, TypeBuilderInfo>();
+        Dictionary<string, TypeBuilderInfo> _typeBuildersDict = new Dictionary<string, TypeBuilderInfo>();
         static Regex collectionRegex = new Regex(@"Collection\((.+)\)", RegexOptions.Compiled);
-        static Queue<TypeBuilderInfo> _builderQueue = new Queue<TypeBuilderInfo>();
+        Queue<TypeBuilderInfo> _builderQueue = new Queue<TypeBuilderInfo>();
         public class TypeBuilderInfo : MarshalByRefObject
         {
             public bool IsDerived { get; set; }
@@ -48,7 +46,7 @@
             }
         }
 
-        public static void BuildModules(IEdmModel model, ModuleBuilder moduleBuilder, string dbContextName)
+        public void BuildModules(IEdmModel model, ModuleBuilder moduleBuilder, string dbContextName)
         {
             //first create the basic types for the enums
             foreach (var modelSchemaElement in model.SchemaElements)
@@ -123,7 +121,7 @@
             
 
             //generate the DbContext type
-            var entitiesBuilder = moduleBuilder.DefineType(dbContextName, TypeAttributes.Class | TypeAttributes.Public, typeof(DbContext));
+            var entitiesBuilder = moduleBuilder.DefineType(dbContextName + "Context", TypeAttributes.Class | TypeAttributes.Public, typeof(DbContext));
             var dbContextType = typeof(DbContext);
             entitiesBuilder.CreateDefaultConstructor(dbContextType, "name=" + dbContextName);
 
@@ -152,7 +150,7 @@
             entitiesBuilder.CreateType();
         }
 
-        internal static TypeBuilder CreateType(IEdmStructuredType targetType, ModuleBuilder moduleBuilder, string moduleName)
+        internal TypeBuilder CreateType(IEdmStructuredType targetType, ModuleBuilder moduleBuilder, string moduleName)
         {
             if (_typeBuildersDict.ContainsKey(moduleName))
             {
@@ -184,7 +182,7 @@
             }
         }
 
-        internal static void Compile(IEdmStructuredType type, ModuleBuilder moduleBuilder, string moduleName, bool navPass = false)
+        internal void Compile(IEdmStructuredType type, ModuleBuilder moduleBuilder, string moduleName, bool navPass = false)
         {
             TypeBuilder typeBuilder = null;
 
@@ -231,7 +229,7 @@
             }
         }
 
-        internal static EnumBuilder CreateType(IEdmEnumType targetType, ModuleBuilder moduleBuilder, string moduleName)
+        internal EnumBuilder CreateType(IEdmEnumType targetType, ModuleBuilder moduleBuilder, string moduleName)
         {
             if (_typeBuildersDict.ContainsKey(moduleName))
             {
@@ -245,7 +243,7 @@
             return typeBuilder;
         }
 
-        internal static void Compile(IEdmEnumType type, ModuleBuilder moduleBuilder, string moduleName)
+        internal void Compile(IEdmEnumType type, ModuleBuilder moduleBuilder, string moduleName)
         {
             var typeBuilder = CreateType(type, moduleBuilder, moduleName);
             foreach (var enumMember in type.Members)
@@ -254,7 +252,7 @@
             }
         }
 
-        internal static void GenerateProperty(IEdmProperty property, TypeBuilder typeBuilder, ModuleBuilder moduleBuilder, int? keyIndex = null)
+        internal void GenerateProperty(IEdmProperty property, TypeBuilder typeBuilder, ModuleBuilder moduleBuilder, int? keyIndex = null)
         {
             var propertyName = property.Name;
             var emdPropType = property.Type.PrimitiveKind();
@@ -373,7 +371,7 @@
         // could also use Domain.SetData()/Domain.GetData() on the new domain
         public string csdlFileName { get; set; }
 
-        public Type GenerateDbContext(string csdlFileName)
+        public Type GenerateDbContext(string csdlFileName, bool save=false)
         {
             // Get name for assembly
             string dbContextName = csdlFileName.Split('\\').Last().Replace(".xml", "");
@@ -390,15 +388,24 @@
 
                 // Build Assembly
                 AssemblyName assembly_Name = new AssemblyName(assemblyName);
-                AssemblyBuilder assemblyBuilder = appDomain.DefineDynamicAssembly(assembly_Name, AssemblyBuilderAccess.RunAndSave);
+                AssemblyBuilder assemblyBuilder = appDomain.DefineDynamicAssembly(assembly_Name, AssemblyBuilderAccess.RunAndCollect);
                 ModuleBuilder module = assemblyBuilder.DefineDynamicModule($"{assembly_Name.Name}");
-                BuildModules(model, module, dbContextName);
-                //assemblyBuilder.Save($"{assembly_Name.Name}.dll");
+                DbContextGenerator generator = new DbContextGenerator();
+                generator.BuildModules(model, module, dbContextName);
+
+                // save for debugging purposes
+                if (save)
+                {
+                    assemblyBuilder.Save($"{assembly_Name.Name}.dll");
+                }
+
                 assembly = appDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == assemblyName);
             }
 
+            
             // Return generated DbContext
-            return assembly.GetTypes().FirstOrDefault(t => t.Name == dbContextName);
+            Type dbContext =  assembly.GetTypes().FirstOrDefault(t => t.Name == dbContextName + "Context");
+            return dbContext;
         }
 
         public void GenerateDbContextInANewAppDomain()
@@ -412,19 +419,6 @@
             // try to pass back to calling assembly. This does not work.
             AppDomain domain = AppDomain.CurrentDomain.GetData("domain") as AppDomain;
             domain.SetData("contextType", dbContextType);
-        }
-    }
-
-    public class Program
-    {
-        // support cmd-line for testing
-        static void Main(string[] args)
-        {
-            //TODO: grab edm path and assembly name from cmdline args
-            string csdlFile = @"Trippin.xml";
-
-            DbContextGenerator generator = new DbContextGenerator();
-            generator.GenerateDbContext(csdlFile);
         }
     }
 }

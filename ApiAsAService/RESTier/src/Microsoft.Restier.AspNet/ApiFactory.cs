@@ -1,15 +1,7 @@
-﻿using Microsoft.AspNet.OData.Extensions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Restier.Core;
-using Microsoft.Restier.Core.Model;
+﻿using Microsoft.Restier.Core;
 using Microsoft.Restier.EntityFramework;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web;
 
 namespace Microsoft.Restier.AspNet
 {
