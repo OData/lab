@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\WebAPI\src\Microsoft.AspNet.OData\Microsoft.AspNet.OData.csproj" />
+    <ProjectReference Include="..\Microsoft.Restier.Core\Microsoft.Restier.Core.csproj" />
+  </ItemGroup>
+
+</Project>

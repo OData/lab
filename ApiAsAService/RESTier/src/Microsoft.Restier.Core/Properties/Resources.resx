@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CallQueryableSourceMethodNotSupported" xml:space="preserve">
+    <value>Calling the methods in 'QueryableSource' or 'QueryableSource&lt;T&gt;' is not supported.</value>
+  </data>
+  <data name="CannotSetChangeSetIfThereIsResult" xml:space="preserve">
+    <value>The change set cannot be set if there is already a result.</value>
+  </data>
+  <data name="CannotSetResultsSourceIfThereIsAnyError" xml:space="preserve">
+    <value>The results source cannot be set if there is any error.</value>
+  </data>
+  <data name="CannotSetTotalCountIfThereIsNoResult" xml:space="preserve">
+    <value>The total count cannot be set if there is no result yet.</value>
+  </data>
+  <data name="ChangeSetPreparerMissing" xml:space="preserve">
+    <value>Change set preparer is missing.</value>
+  </data>
+  <data name="DataModificationMustBeCUD" xml:space="preserve">
+    <value>A DataModification must be either: IsNew, IsUpdate, or IsDelete.</value>
+  </data>
+  <data name="DataModificationNotSupportCreateResource" xml:space="preserve">
+    <value>"DataModificationItem.ApplyTo cannot be called on an new resource.</value>
+  </data>
+  <data name="DataModificationRequiresResourceKey" xml:space="preserve">
+    <value>There should have been at least one predicate applied to the query from the resource key.  Ensure there is at least one resource key.</value>
+  </data>
+  <data name="DoNotCallDataSourceStubMethodDirectly" xml:space="preserve">
+    <value>Do not call the methods in 'DataSourceStub' directly.</value>
+  </data>
+  <data name="ElementTypeNotFound" xml:space="preserve">
+    <value>Element type cannot be found for '{0}'.</value>
+  </data>
+  <data name="ElementTypeNotMatch" xml:space="preserve">
+    <value>Element type not match.</value>
+  </data>
+  <data name="ExpanderCannotChangeExpressionType" xml:space="preserve">
+    <value>Expander cannot change the expression type.</value>
+  </data>
+  <data name="ExpressionMustBeQueryable" xml:space="preserve">
+    <value>Expression must be queryable.</value>
+  </data>
+  <data name="ProcessorCannotChangeExpressionType" xml:space="preserve">
+    <value>Processor cannot change the expression type.</value>
+  </data>
+  <data name="InspectionFailed" xml:space="preserve">
+    <value>Inspection failed.</value>
+  </data>
+  <data name="InvalidChangeSetEntryType" xml:space="preserve">
+    <value>Invalid ChangeSetItem Type: {0}.</value>
+  </data>
+  <data name="NoPermissionToDeleteEntity" xml:space="preserve">
+    <value>InvalidChangeSetEntryType</value>
+  </data>
+  <data name="NoPermissionToInsertEntity" xml:space="preserve">
+    <value>The current user does not have permission to insert entities into the EntitySet '{0}'.</value>
+  </data>
+  <data name="NoPermissionToInvokeAction" xml:space="preserve">
+    <value>The current user does not have permission to invoke the requested action '{0}'.</value>
+  </data>
+  <data name="NoPermissionToUpdateEntity" xml:space="preserve">
+    <value>The current user does not have permission to update entities in the EntitySet '{0}'.</value>
+  </data>
+  <data name="NotSupportedType" xml:space="preserve">
+    <value>Not supported type: {0}.</value>
+  </data>
+  <data name="OriginalExpressionShouldBeConstant" xml:space="preserve">
+    <value>Original query expression should be constant expression.</value>
+  </data>
+  <data name="OriginalExpressionShouldBeQueryable" xml:space="preserve">
+    <value>Original query expression should contain a value which is queryable.</value>
+  </data>
+  <data name="QueryableSourceCannotBeUsedAsQuery" xml:space="preserve">
+    <value>'QueryableSource' cannot be used as query.</value>
+  </data>
+  <data name="QueryExecutorMissing" xml:space="preserve">
+    <value>Query executor is missing.</value>
+  </data>
+  <data name="QuerySourcerMissing" xml:space="preserve">
+    <value>Query expression sourcer is missing.</value>
+  </data>
+  <data name="ShouldBeInterfaceType" xml:space="preserve">
+    <value>Should specify an interface type T for the handler.</value>
+  </data>
+  <data name="SourceExpressionMissing" xml:space="preserve">
+    <value>Expression returned by sourcer is missing.</value>
+  </data>
+  <data name="SubmitExecutorMissing" xml:space="preserve">
+    <value>Submit executor is missing.</value>
+  </data>
+  <data name="ValidationFailsTheOperation" xml:space="preserve">
+    <value>The operation cannot be performed because one or more objects are invalid.  Please inspect the ChangeSetValidationException.ValidationResults property for more information.</value>
+  </data>
+  <data name="ModelBuilderNotRegistered" xml:space="preserve">
+    <value>IEdmModel cannot be generated since API service IModelBuilder is not registered.</value>
+  </data>
+  <data name="EdmTypeNotSupported" xml:space="preserve">
+    <value>{0} is not a supported EDM type.</value>
+  </data>
+  <data name="ResourceNotFound" xml:space="preserve">
+    <value>The request resource is not found.</value>
+  </data>
+  <data name="PreconditionCheckFailed" xml:space="preserve">
+    <value>The precondition check for request {0} on resource {1} is failed.</value>
+  </data>
+  <data name="ArgumentCanNotBeNull" xml:space="preserve">
+    <value>The argument with name {0} can not be null.</value>
+  </data>
+  <data name="QueryShouldGetSingleRecord" xml:space="preserve">
+    <value>A query for a single entity resulted in more than one record.</value>
+  </data>
+  <data name="MetadataTypeAttribute_TypeCannotBeNull" xml:space="preserve">
+    <value>MetadataClassType cannot be null.</value>
+  </data>
+  <data name="AssociatedMetadataTypeTypeDescriptor_MetadataTypeContainsUnknownProperties" xml:space="preserve">
+    <value>The associated metadata type for type '{0}' contains the following unknown properties or fields: {1}. Please make sure that the names of these members match the names of the properties on the main type.</value>
+  </data>
+  <data name="QueryMemberNotAccessible" xml:space="preserve">
+    <value>The LINQ expression for part {0} was not accessible. This may indicate your query has static member components, possibly from an extension method. This is not currently supported./r/nPlease check the EntitySet filter, and see https://github.com/OData/RESTier/issues/564 for more information.</value>
+  </data>
+</root>
